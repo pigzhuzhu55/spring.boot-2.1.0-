@@ -1,0 +1,14 @@
+server:
+    port: 8080
+    servlet:
+        context-path: ''
+    tomcat:
+      uri-encoding: utf-8
+    undertow:
+       accesslog:
+          enabled: true
+          dir: ./logs
+logging:
+  config: classpath:log4j2.xml
+
+
