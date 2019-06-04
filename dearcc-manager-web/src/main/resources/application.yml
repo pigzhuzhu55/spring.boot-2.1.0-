@@ -8,7 +8,30 @@ server:
        accesslog:
           enabled: true
           dir: ./logs
+
+
 logging:
   config: classpath:log4j2.xml
 
+spring:
+  profiles:
+    active: dev
+
+
+mapper:
+  mappers: com.wolf.dearcc.dao.MyMapper
+  not-empty: false
+  safeDelete: true
+mybatis:
+  mapper-locations: classpath:com/wolf/dearcc/dao/mapper/config/*Mapper.xml
+  typeAliasesPackage: com.wolf.dearcc.pojo
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.log4j2.Log4j2Impl
+# 分页配置
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countSql
 

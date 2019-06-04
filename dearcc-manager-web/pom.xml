@@ -65,6 +65,32 @@
         </dependency>
 
 
+        <!-- mybatis starter -->
+        <dependency>
+            <groupId>org.mybatis.spring.boot</groupId>
+            <artifactId>mybatis-spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>tk.mybatis</groupId>
+            <artifactId>mapper-spring-boot-starter</artifactId>
+        </dependency>
+        <!-- pagehelper starter -->
+        <dependency>
+            <groupId>com.github.pagehelper</groupId>
+            <artifactId>pagehelper-spring-boot-starter</artifactId>
+        </dependency>
+        <!-- druid starter -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid-spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+
+
+
         <!--log4j2 Asynchronous Loggers requires disruptor-->
         <dependency>
             <groupId>com.lmax</groupId>
@@ -94,6 +120,18 @@
         <dependency>
             <groupId>com.wolf</groupId>
             <artifactId>dearcc-pojo</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.wolf</groupId>
+            <artifactId>dearcc-dao</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.wolf</groupId>
+            <artifactId>dearcc-service</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>

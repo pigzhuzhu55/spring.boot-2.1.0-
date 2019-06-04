@@ -9,9 +9,9 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>com.wolf</groupId>
-    <artifactId>dearcc-dao</artifactId>
+    <artifactId>dearcc-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>dearcc-dao</name>
+    <name>dearcc-service</name>
     <description>Demo project for Spring Boot</description>
 
     <properties>
@@ -19,11 +19,9 @@
     </properties>
 
     <dependencies>
-
-
         <dependency>
             <groupId>com.wolf</groupId>
-            <artifactId>dearcc-pojo</artifactId>
+            <artifactId>dearcc-dao</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
