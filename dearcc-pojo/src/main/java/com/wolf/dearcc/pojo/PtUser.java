@@ -1,7 +1,7 @@
 /**
 *Name: pt_user
 *Author: Caicai
-*Date: 2019-06-05 17:45:04
+*Date: 2019-06-05 21:38:08
 *Description: Copyright 2019 智趣互联
 */ 
 package com.wolf.dearcc.pojo;
@@ -23,6 +23,9 @@ public class PtUser {
 
     @Column(name = "user_name")
     private String userName;
+
+    @Column(name = "account")
+    private String account;
 
     @Column(name = "password")
     private String password;
@@ -51,6 +54,7 @@ public class PtUser {
     public static class ${
         public static String id="id";
         public static String userName="userName";
+        public static String account="account";
         public static String password="password";
         public static String telephone="telephone";
         public static String lastLoginTime="lastLoginTime";
