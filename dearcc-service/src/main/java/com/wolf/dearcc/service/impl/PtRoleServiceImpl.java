@@ -12,10 +12,15 @@ import com.wolf.dearcc.service.PtRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+
 @Service
 public class PtRoleServiceImpl extends BaseServiceImpl<PtRole,Integer> implements PtRoleService {
     @Autowired
     private PtRoleMapper myMapper;
 
+    public Set<String> findRoleByUserId(Integer userId) {
 
+        return myMapper.findRoleByUserId(userId);
+    }
 }

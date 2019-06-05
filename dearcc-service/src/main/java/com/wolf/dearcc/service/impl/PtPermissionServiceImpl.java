@@ -12,10 +12,14 @@ import com.wolf.dearcc.service.PtPermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+
 @Service
 public class PtPermissionServiceImpl extends BaseServiceImpl<PtPermission,Integer> implements PtPermissionService {
     @Autowired
     private PtPermissionMapper myMapper;
 
-
+    public Set<String> findPermissionByUserId(Integer userId){
+        return myMapper.findPermissionByUserId(userId);
+    }
 }

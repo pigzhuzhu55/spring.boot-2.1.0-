@@ -8,7 +8,10 @@ package com.wolf.dearcc.service;
 
 import com.wolf.dearcc.pojo.PtPermission;
 
+import java.util.Set;
+
 public interface PtPermissionService extends BaseService<PtPermission,Integer> {
 
-
+    //根据用户ID查询权限（permission），放入到Authorization里。
+    Set<String> findPermissionByUserId(Integer userId);
 }

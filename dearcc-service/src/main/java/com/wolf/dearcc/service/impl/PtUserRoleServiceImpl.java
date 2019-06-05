@@ -7,15 +7,19 @@
 package com.wolf.dearcc.service.impl;
 
 import com.wolf.dearcc.dao.mapper.source1.PtUserRoleMapper;
+import com.wolf.dearcc.pojo.PtUser;
 import com.wolf.dearcc.pojo.PtUserRole;
 import com.wolf.dearcc.service.PtUserRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import tk.mybatis.mapper.entity.Example;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class PtUserRoleServiceImpl extends BaseServiceImpl<PtUserRole,Integer> implements PtUserRoleService {
     @Autowired
     private PtUserRoleMapper myMapper;
-
 
 }

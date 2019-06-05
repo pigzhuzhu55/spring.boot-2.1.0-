@@ -1,15 +1,12 @@
 package com.wolf.dearcc.manager.core.shiro.bo;
 
-
 import com.wolf.dearcc.pojo.PtUser;
 import lombok.Data;
-
 import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Session  + User Bo
- * @author sojson.com
  *
  */
 @Data
