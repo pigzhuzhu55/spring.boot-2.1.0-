@@ -23,7 +23,7 @@ mapper:
   not-empty: false
   safeDelete: true
 mybatis:
-  mapper-locations: classpath:com/wolf/dearcc/dao/mapper/config/*Mapper.xml
+  mapper-locations: classpath:com/wolf/dearcc/dao/mapper/core/*Mapper.xml
   typeAliasesPackage: com.wolf.dearcc.pojo
   configuration:
     map-underscore-to-camel-case: true

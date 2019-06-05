@@ -1,7 +1,7 @@
 /**
-*Name: pt_organization
+*Name: pt_user
 *Author: Caicai
-*Date: 2019-06-05 16:10:04
+*Date: 2019-06-05 17:45:04
 *Description: Copyright 2019 智趣互联
 */ 
 package com.wolf.dearcc.pojo;
@@ -12,8 +12,8 @@ import javax.persistence.*;
  
  
 @Data
-@Table(name = "pt_organization")
-public class PtOrganization {
+@Table(name = "pt_user")
+public class PtUser {
 
     @Id
     @KeySql(useGeneratedKeys = true)
@@ -21,26 +21,17 @@ public class PtOrganization {
     @Column(name = "id",insertable = false,updatable = false)
     private Integer id;
 
-    @Column(name = "org_name")
-    private String orgName;
+    @Column(name = "user_name")
+    private String userName;
 
-    @Column(name = "org_type")
-    private byte orgType;
-
-    @Column(name = "org_suffix")
-    private String orgSuffix;
-
-    @Column(name = "logo")
-    private String logo;
+    @Column(name = "password")
+    private String password;
 
     @Column(name = "telephone")
     private String telephone;
 
-    @Column(name = "max_campus")
-    private Integer maxCampus;
-
-    @Column(name = "max_account")
-    private Integer maxAccount;
+    @Column(name = "last_login_time")
+    private java.util.Date lastLoginTime;
 
     @Column(name = "create_time")
     private java.util.Date createTime;
@@ -59,13 +50,10 @@ public class PtOrganization {
     
     public static class ${
         public static String id="id";
-        public static String orgName="orgName";
-        public static String orgType="orgType";
-        public static String orgSuffix="orgSuffix";
-        public static String logo="logo";
+        public static String userName="userName";
+        public static String password="password";
         public static String telephone="telephone";
-        public static String maxCampus="maxCampus";
-        public static String maxAccount="maxAccount";
+        public static String lastLoginTime="lastLoginTime";
         public static String createTime="createTime";
         public static String createUid="createUid";
         public static String modifyTime="modifyTime";
