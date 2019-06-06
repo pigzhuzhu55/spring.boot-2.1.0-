@@ -29,7 +29,7 @@ public class SignController {
     public ApiResult<SignInDto> LoginIn(@RequestBody @Valid SignInForm form) {
 
 
-        PtOrganization obj =   ptOrganizationService.queryOneByPrimaryKey(1);
+        //PtOrganization obj =   ptOrganizationService.queryOneByPrimaryKey(1);
 
         return ApiResult.Success();
     }

@@ -10,6 +10,7 @@ import com.wolf.dearcc.pojo.PtUser;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
@@ -22,6 +23,7 @@ public class TokenManager {
     public static final SampleRealm realm = SpringContextUtil.getBean("sampleRealm",SampleRealm.class);
     //用户session管理
     public static final CustomSessionManager customSessionManager = SpringContextUtil.getBean("customSessionManager",CustomSessionManager.class);
+
     /**
      * 获取当前登录的用户User对象
      * @return
