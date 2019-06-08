@@ -20,9 +20,15 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class TokenManager {
     //用户登录管理
-    public static final SampleRealm realm = SpringContextUtil.getBean("sampleRealm",SampleRealm.class);
+    //public static final SampleRealm sampleRealm = SpringContextUtil.getBean("sampleRealm",SampleRealm.class);
     //用户session管理
-    public static final CustomSessionManager customSessionManager = SpringContextUtil.getBean("customSessionManager",CustomSessionManager.class);
+    //public static final CustomSessionManager customSessionManager = SpringContextUtil.getBean("customSessionManager",CustomSessionManager.class);
+
+    @Autowired
+    private static SampleRealm sampleRealm;
+
+    @Autowired
+    private static CustomSessionManager customSessionManager;
 
     /**
      * 获取当前登录的用户User对象
@@ -131,7 +137,7 @@ public class TokenManager {
         /**
          * 方法二、通过ApplicationContext 从Spring容器里获取实列化对象。
          */
-        realm.clearCachedAuthorizationInfo();
+        sampleRealm.clearCachedAuthorizationInfo();
         /**
          * 当然还有很多直接或者间接的方法，此处不纠结。
          */
@@ -150,7 +156,7 @@ public class TokenManager {
         List<SimplePrincipalCollection> result = customSessionManager.getSimplePrincipalCollectionByUserId(userIds);
 
         for (SimplePrincipalCollection simplePrincipalCollection : result) {
-            realm.clearCachedAuthorizationInfo(simplePrincipalCollection);
+            sampleRealm.clearCachedAuthorizationInfo(simplePrincipalCollection);
         }
     }
 

@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import springfox.documentation.spring.web.SpringfoxWebMvcConfiguration;
 
@@ -20,6 +21,7 @@ import springfox.documentation.spring.web.SpringfoxWebMvcConfiguration;
                 "com.wolf.dearcc.dao",
         })
 @ConditionalOnClass(SpringfoxWebMvcConfiguration.class)
+@EnableCaching
 public class DearccManagerWebApplication {
 
     private static final Logger logger = LoggerFactory.getLogger(DearccManagerWebApplication.class);

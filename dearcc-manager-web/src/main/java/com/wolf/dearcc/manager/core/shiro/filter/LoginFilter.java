@@ -23,28 +23,28 @@ public class LoginFilter extends AccessControlFilter {
 	@Override
 	protected boolean isAccessAllowed(ServletRequest request,
                                       ServletResponse response, Object mappedValue) throws Exception {
-		
+
 		PtUser token = TokenManager.getToken();
-		
+
 		if(null != token || isLoginRequest(request, response)){// && isEnabled()
             return Boolean.TRUE;
-        } 
-		if (ShiroFilterUtils.isAjax(request)) {// ajax请求
-			Map<String,String> resultMap = new HashMap<String, String>();
+        }
+		if (ShiroFilterUtils.isAjax(request)) {// ajax请求f
 			LoggerUtils.debug(getClass(), "当前用户没有登录，并且是Ajax请求！");
 			ShiroFilterUtils.out(response, ApiResult.Fail("当前用户没有登录"));
 		}
 		return Boolean.FALSE ;
-            
+
 	}
 
 	@Override
 	protected boolean onAccessDenied(ServletRequest request, ServletResponse response)
 			throws Exception {
-		//保存Request和Response 到登录后的链接
-		saveRequestAndRedirectToLogin(request, response);
+		if (!ShiroFilterUtils.isAjax(request)) {
+			//保存Request和Response 到登录后的链接
+			saveRequestAndRedirectToLogin(request, response);
+		}
 		return Boolean.FALSE ;
 	}
-	
 
 }

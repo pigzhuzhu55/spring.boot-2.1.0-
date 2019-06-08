@@ -41,12 +41,13 @@ public class ShiroFilterUtils {
 	 * @throws IOException
 	 */
 	public static void out(ServletResponse response, ApiResult result){
-		
+
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
 		PrintWriter out = null;
 		try {
-			response.setCharacterEncoding("UTF-8");
 			out = response.getWriter();
-			out.println(JSONObject.fromObject(result).toString());
+			out.write(result.toString());
 		} catch (Exception e) {
 			LoggerUtils.fmtError(CLAZZ, e, "输出JSON报错。");
 		}finally{

@@ -9,11 +9,13 @@ package com.wolf.dearcc.pojo;
 import lombok.Data;
 import tk.mybatis.mapper.annotation.KeySql;
 import javax.persistence.*;
- 
- 
+import java.io.Serializable;
+
+
 @Data
 @Table(name = "pt_user")
-public class PtUser {
+public class PtUser implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     @Id
     @KeySql(useGeneratedKeys = true)

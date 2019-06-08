@@ -1,17 +1,22 @@
 package com.wolf.dearcc.manager.core.shiro;
 
-import com.wolf.dearcc.manager.core.shiro.cache.EhcacheShiroSessionRepository;
+import com.wolf.dearcc.manager.core.shiro.cache.EhCacheShiroSessionRepository;
+import com.wolf.dearcc.manager.core.shiro.cache.impl.CustomShiroCacheManager;
+import com.wolf.dearcc.manager.core.shiro.cache.impl.EhCacheShiroCacheManager;
 import com.wolf.dearcc.manager.core.shiro.filter.LoginFilter;
 import com.wolf.dearcc.manager.core.shiro.listenter.CustomSessionListener;
 import com.wolf.dearcc.manager.core.shiro.session.CustomSessionManager;
 import com.wolf.dearcc.manager.core.shiro.session.ShiroSessionRepository;
 import com.wolf.dearcc.manager.core.shiro.token.SampleRealm;
+import net.sf.ehcache.CacheManager;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
+import org.apache.shiro.io.ResourceUtils;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.session.SessionListener;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.apache.shiro.session.mgt.eis.MemorySessionDAO;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
+import org.apache.shiro.session.mgt.eis.SessionIdGenerator;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
@@ -19,12 +24,11 @@ import org.apache.shiro.web.filter.authc.PassThruAuthenticationFilter;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.servlet.SimpleCookie;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.servlet.Filter;
-import java.io.Serializable;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -64,6 +68,8 @@ public class ShiroConfig {
 		filterChainDefinitionMap.put("/v2/api-docs/**", "anon");
 		filterChainDefinitionMap.put("/swagger-resources/**", "anon");
 
+		filterChainDefinitionMap.put("/api/none/sign/in", "anon");
+
 
 		filterChainDefinitionMap.put("/**", "loginFilter,authc");
 		shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
@@ -82,8 +88,8 @@ public class ShiroConfig {
 		DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
 		// 设置realm.
 		securityManager.setRealm(sampleRealm());
-		securityManager.setCacheManager(ehCacheManager());
 		securityManager.setSessionManager(sessionManager());
+		securityManager.setCacheManager(customShiroCacheManager());
 		return securityManager;
 	}
 
@@ -107,15 +113,35 @@ public class ShiroConfig {
 	}
 
 	@Bean
+	public CustomShiroCacheManager customShiroCacheManager(){
+		CustomShiroCacheManager customShiroCacheManager = new CustomShiroCacheManager();
+		customShiroCacheManager.setShiroCacheManager(ehCacheShiroCacheManager());
+		return customShiroCacheManager;
+	}
+
+	@Bean
+	public EhCacheShiroCacheManager ehCacheShiroCacheManager(){
+
+		return new EhCacheShiroCacheManager();
+	}
+
+
+	@Bean
 	public CustomShiroSessionDAO customShiroSessionDAO() {
 		CustomShiroSessionDAO customShiroSessionDAO = new CustomShiroSessionDAO();
-		customShiroSessionDAO.setShiroSessionRepository(shiroSessionRepository());
+		customShiroSessionDAO.setShiroSessionRepository(ehCacheShiroSessionRepository());
+		customShiroSessionDAO.setSessionIdGenerator(sessionIdGenerator());
 		return customShiroSessionDAO;
 	}
 
 	@Bean
-	public ShiroSessionRepository shiroSessionRepository(){
-		return new EhcacheShiroSessionRepository();
+	public SessionIdGenerator sessionIdGenerator(){
+		return  new org.apache.shiro.session.mgt.eis.JavaUuidSessionIdGenerator();
+	}
+
+	@Bean
+	public ShiroSessionRepository ehCacheShiroSessionRepository(){
+		return new EhCacheShiroSessionRepository();
 	}
 
 
@@ -128,12 +154,8 @@ public class ShiroConfig {
 		sessionManager.setGlobalSessionTimeout(tomcatTimeout * 1000);
 		sessionManager.setSessionDAO(customShiroSessionDAO());
 
-//		SimpleCookie simpleCookie = new SimpleCookie();
-//		simpleCookie.setName("dearcc.session.id");
-//		simpleCookie.setMaxAge(-1);
-//		simpleCookie.setHttpOnly(true);
-//		sessionManager.setSessionIdCookie(simpleCookie);
-//		sessionManager.setSessionIdCookieEnabled(true);
+		//设置在cookie中的sessionId名称
+		sessionManager.setSessionIdCookie(simpleCookie());
 
 		Collection<SessionListener> listeners = new ArrayList<SessionListener>();
 		listeners.add(new CustomSessionListener());
@@ -142,27 +164,45 @@ public class ShiroConfig {
 	}
 
 	@Bean
+	public SimpleCookie simpleCookie(){
+
+		SimpleCookie simpleCookie = new SimpleCookie();
+		simpleCookie.setName("shiro.session.id");
+
+		return simpleCookie;
+	}
+
+
+	@Bean
 	public EhCacheManager ehCacheManager() {
-		EhCacheManager em = new EhCacheManager();
-		em.setCacheManagerConfigFile("classpath:ehcache.xml");
-		return em;
+		EhCacheManager ehCacheManager = new EhCacheManager();
+		ehCacheManager.setCacheManager(ehCacheManagerFactoryBean());
+		return ehCacheManager;
+	}
+
+	/**
+	 * 管理缓存 解决热部署 Ehcache重复创建CacheManager问题
+	 * @return
+	 */
+	@Bean(name = "ehcacheManager")
+	public CacheManager ehCacheManagerFactoryBean() {
+		CacheManager cacheManager = CacheManager.getCacheManager("es");
+		if(cacheManager == null){
+			try {
+				cacheManager = CacheManager.create(ResourceUtils.getInputStreamForPath("classpath:ehcache.xml"));
+			} catch (IOException e) {
+				throw new RuntimeException("initialize cacheManager failed");
+			}
+		}
+		return cacheManager;
 	}
 
 	@Bean
 	public CustomSessionManager customSessionManager(){
 		CustomSessionManager customSessionManager = new CustomSessionManager();
-		customSessionManager.setShiroSessionRepository(shiroSessionRepository());
+		customSessionManager.setShiroSessionRepository(ehCacheShiroSessionRepository());
 		customSessionManager.setCustomShiroSessionDAO(customShiroSessionDAO());
 		return customSessionManager;
-	}
-
-
-	/*
-	默认的SessionDAO
-	 */
-	@Bean
-	public SessionDAO sessionDAO() {
-		return new MemorySessionDAO();
 	}
 
 }
