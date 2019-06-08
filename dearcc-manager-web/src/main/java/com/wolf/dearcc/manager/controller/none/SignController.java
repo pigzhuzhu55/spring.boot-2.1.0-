@@ -11,6 +11,9 @@ import com.wolf.dearcc.service.PtUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.bind.annotation.*;
 import com.wolf.dearcc.common.model.*;
 
@@ -21,7 +24,12 @@ import javax.validation.Valid;
 @RequestMapping(value = {"/api/none/sign"})
 public class SignController {
 
-
+    @Autowired
+    @Qualifier("redisTemplate2")
+    private RedisTemplate redis2;
+    @Autowired
+    @Qualifier("redisTemplate")
+    private RedisTemplate redis1;
 
 
     @Autowired
@@ -34,6 +42,12 @@ public class SignController {
     @RequestMapping(value = "/in",method = RequestMethod.POST)
     @ResponseBody()
     public ApiResult<SignInDto> LoginIn(@RequestBody @Valid SignInForm form) {
+
+
+        ValueOperations<String,Object> operations = redis2.opsForValue();
+        operations.set("test1","12321");
+
+        Object o = operations.get("test1");
 
          PtUser user = ptUserService.queryOneByPrimaryKey(1);
 

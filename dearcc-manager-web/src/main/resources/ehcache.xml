@@ -23,9 +23,9 @@
   -->
     <defaultCache
             eternal="false"
-            maxElementsInMemory="0"
+            maxElementsInMemory="1000"
             overflowToDisk="true"
-            diskPersistent="false"
+            diskPersistent="true"
             timeToIdleSeconds="0"
             timeToLiveSeconds="600"
             memoryStoreEvictionPolicy="LRU" />
@@ -34,9 +34,9 @@
     <cache
             name="users"
             eternal="false"
-            maxElementsInMemory="0"
+            maxElementsInMemory="1000"
             overflowToDisk="true"
-            diskPersistent="false"
+            diskPersistent="true"
             timeToIdleSeconds="0"
             timeToLiveSeconds="300"
             memoryStoreEvictionPolicy="LRU" />
@@ -44,9 +44,9 @@
     <cache
             name="session"
             eternal="false"
-            maxElementsInMemory="0"
+            maxElementsInMemory="1000"
             overflowToDisk="true"
-            diskPersistent="false"
+            diskPersistent="true"
             timeToIdleSeconds="300"
             timeToLiveSeconds="0"
             memoryStoreEvictionPolicy="LRU" />
