@@ -101,7 +101,7 @@ public class ShiroConfig {
 		return securityManager;
 	}
 
-	@Bean
+	@Bean(name="sampleRealm")
 	SampleRealm sampleRealm() {
 		SampleRealm sampleRealm = new SampleRealm();
 		return sampleRealm;
@@ -143,9 +143,9 @@ public class ShiroConfig {
 	@Bean
 	public ShiroSessionRepository shiroSessionRepository(){
 		if(cacheType.equals("redis")){
-			return new RedisShiroSessionRepository();
+			return  new RedisShiroSessionRepository(redis1);
 		}
-		return new EhCacheShiroSessionRepository();
+		return new EhCacheShiroSessionRepository(ehCacheManager());
 	}
 
 	@Bean
@@ -248,7 +248,7 @@ public class ShiroConfig {
 	/**
 	 *
 	 */
-	@Bean
+	@Bean(name="customSessionManager")
 	public CustomSessionManager customSessionManager(){
 		CustomSessionManager customSessionManager = new CustomSessionManager();
 		customSessionManager.setShiroSessionRepository(shiroSessionRepository());

@@ -27,6 +27,18 @@ public class EhCacheShiroSessionRepository implements ShiroSessionRepository {
     @Autowired
     private EhCacheManager ehCacheManager;
 
+    public EhCacheShiroSessionRepository(EhCacheManager ehCacheManager){
+        this.ehCacheManager=ehCacheManager;
+    }
+
+    public EhCacheManager getEhCacheManager() {
+        return ehCacheManager;
+    }
+
+    public void setEhCacheManager(EhCacheManager ehCacheManager) {
+        this.ehCacheManager = ehCacheManager;
+    }
+
     @Override
     public void saveSession(Session session) {
         if (session == null || session.getId() == null)
@@ -82,6 +94,21 @@ public class EhCacheShiroSessionRepository implements ShiroSessionRepository {
     @Override
     public Collection<Session> getAllSessions() {
        return null;
+    }
+
+    @Override
+    public String getSessonId(String userId) {
+        return null;
+    }
+
+    @Override
+    public void deleteSessionId(String userId) {
+
+    }
+
+    @Override
+    public void setSessionId(String userId, String sessionId) {
+
     }
 
     private String buildEhCacheSessionKey(Serializable sessionId) {

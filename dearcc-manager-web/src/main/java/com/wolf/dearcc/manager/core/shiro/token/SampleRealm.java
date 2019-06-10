@@ -1,5 +1,7 @@
 package com.wolf.dearcc.manager.core.shiro.token;
 
+import com.wolf.dearcc.common.utils.StringUtils;
+import com.wolf.dearcc.manager.core.shiro.session.ShiroSessionRepository;
 import com.wolf.dearcc.manager.core.shiro.token.manager.TokenManager;
 import com.wolf.dearcc.pojo.PtUser;
 import com.wolf.dearcc.service.PtPermissionService;
@@ -13,7 +15,12 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 
+import javax.annotation.PostConstruct;
 import java.util.Date;
 import java.util.Set;
 
@@ -36,6 +43,7 @@ public class SampleRealm extends AuthorizingRealm {
 	public static final short forbit = 1;
 	//1:有效
 	public static final short valid = 0;
+
 
 	public SampleRealm() {
 		super();
@@ -60,7 +68,18 @@ public class SampleRealm extends AuthorizingRealm {
 			user.setLastLoginTime(new Date());
 			userService.updateByPrimaryKeySelective(user);
 		}
-		return new SimpleAuthenticationInfo(user,user.getPassword(), getName());
+		SimpleAuthenticationInfo sai = new SimpleAuthenticationInfo(user,user.getPassword(), getName());
+
+		String sessionId = SecurityUtils.getSubject().getSession().getId().toString();
+
+		//互踢
+		String singleSessionId = TokenManager.customSessionManager.getShiroSessionRepository().getSessonId(user.getId().toString());
+		if (StringUtils.isNotBlank(singleSessionId) && !sessionId.equals(singleSessionId)) {
+			TokenManager.customSessionManager.getShiroSessionRepository().deleteSession(user.getId().toString());
+		}
+		TokenManager.customSessionManager.getShiroSessionRepository().setSessionId(user.getId().toString(),sessionId);
+
+		return  sai;
     }
 
 	 /** 

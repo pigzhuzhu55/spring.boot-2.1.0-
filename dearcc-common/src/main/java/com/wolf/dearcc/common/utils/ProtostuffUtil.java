@@ -5,6 +5,7 @@ import com.dyuproject.protostuff.LinkedBuffer;
 import com.dyuproject.protostuff.ProtostuffIOUtil;
 import com.dyuproject.protostuff.Schema;
 import com.dyuproject.protostuff.runtime.RuntimeSchema;
+import net.sf.json.JSONObject;
 import org.objenesis.Objenesis;
 import org.objenesis.ObjenesisStd;
 
@@ -33,14 +34,16 @@ public class ProtostuffUtil {
     public static <T> byte[] serialize(T obj){
         Class<T> cls = (Class<T>) obj.getClass();
         LinkedBuffer buffer = LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE);
+        byte[] rv = null;
         try {
             Schema<T> schema = getSchema(cls);
-            return ProtostuffIOUtil.toByteArray(obj, schema, buffer);
+            rv =  ProtostuffIOUtil.toByteArray(obj, schema, buffer);
         } catch (Exception e) {
-            throw new IllegalStateException(e.getMessage(), e);
+            LoggerUtils.fmtError(cls,e, "serialize error %s", JSONObject.fromObject(obj));
         } finally {
             buffer.clear();
         }
+        return rv;
     }
 
     /**
@@ -57,7 +60,8 @@ public class ProtostuffUtil {
             ProtostuffIOUtil.mergeFrom(data, message, schema);
             return message;
         } catch (Exception e) {
-            throw new IllegalStateException(e.getMessage(), e);
+            LoggerUtils.fmtError(cls,e, "deserialize error %s", data);
+            return null;
         }
     }
 

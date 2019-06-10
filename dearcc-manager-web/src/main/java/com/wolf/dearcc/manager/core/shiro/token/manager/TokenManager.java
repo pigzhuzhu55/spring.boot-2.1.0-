@@ -20,15 +20,15 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class TokenManager {
     //用户登录管理
-    //public static final SampleRealm sampleRealm = SpringContextUtil.getBean("sampleRealm",SampleRealm.class);
+    public static final SampleRealm sampleRealm = SpringContextUtil.getBean("sampleRealm",SampleRealm.class);
     //用户session管理
-    //public static final CustomSessionManager customSessionManager = SpringContextUtil.getBean("customSessionManager",CustomSessionManager.class);
+    public static final CustomSessionManager customSessionManager = SpringContextUtil.getBean("customSessionManager",CustomSessionManager.class);
 
-    @Autowired
-    private static SampleRealm sampleRealm;
-
-    @Autowired
-    private static CustomSessionManager customSessionManager;
+//    @Autowired
+//    private static SampleRealm sampleRealm;
+//
+//    @Autowired
+//    public static CustomSessionManager customSessionManager;
 
     /**
      * 获取当前登录的用户User对象

@@ -52,7 +52,7 @@ public class SerializeUtil {
                 rv = is.readObject();
             }
         } catch (Exception e) {
-            LoggerUtils.fmtError(CLAZZ,e, "serialize error %s", in);
+            LoggerUtils.fmtError(CLAZZ,e, "deserialize error %s", in);
         } finally {
             close(is);
             close(bis);

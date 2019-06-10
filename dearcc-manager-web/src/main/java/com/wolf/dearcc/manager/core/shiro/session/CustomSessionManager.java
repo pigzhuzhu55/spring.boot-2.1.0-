@@ -22,6 +22,11 @@ public class CustomSessionManager {
 	 * session status 
 	 */
 	public static final String SESSION_STATUS ="ONLINE";
+
+	public ShiroSessionRepository getShiroSessionRepository() {
+		return shiroSessionRepository;
+	}
+
 	ShiroSessionRepository shiroSessionRepository;
 	
 	CustomShiroSessionDAO customShiroSessionDAO;
