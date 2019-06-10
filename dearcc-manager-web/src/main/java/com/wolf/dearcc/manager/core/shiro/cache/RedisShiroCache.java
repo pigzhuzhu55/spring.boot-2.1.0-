@@ -2,10 +2,11 @@ package com.wolf.dearcc.manager.core.shiro.cache;
 
 import com.wolf.dearcc.common.utils.LoggerUtils;
 import com.wolf.dearcc.common.utils.ProtostuffUtil;
+import com.wolf.dearcc.manager.core.shiro.bo.SimpleSessionEx;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
-import org.apache.shiro.cache.ehcache.EhCacheManager;
-import org.apache.shiro.session.Session;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 
 import java.util.Collection;
 import java.util.Set;
@@ -14,33 +15,29 @@ import java.util.Set;
  *
  * 缓存获取Manager
  *
- *
- *
+ * 
  */
 @SuppressWarnings("unchecked")
-public class EhCacheShiroCache<K, V> extends ShiroCache implements Cache<K, V> {
+public class RedisShiroCache<K, V> extends ShiroCache implements Cache<K, V> {
 
-    protected static final String SHIRO_CACHE_NAME = "users";
+    private RedisTemplate redis;
 
-    private EhCacheManager ehCacheManager;
-
-
-	static final Class<EhCacheShiroCache> SELF = EhCacheShiroCache.class;
-    public EhCacheShiroCache(String name, EhCacheManager ehCacheManager) {
+	static final Class<RedisShiroCache> SELF = RedisShiroCache.class;
+    public RedisShiroCache(String name, RedisTemplate redis) {
         this.setName(name);
-        this.ehCacheManager = ehCacheManager;
+        this.redis = redis;
     }
-
 
     @Override
     public V get(K key) throws CacheException {
+        byte[] byteValue = new byte[0];
         try {
-            byte[] byteValue = (byte[])ehCacheManager.getCache(SHIRO_CACHE_NAME).get(buildCacheKey(key));
-            return (V) ProtostuffUtil.deserialize(byteValue,Object.class);
+            ValueOperations<String,Object> operations = redis.opsForValue();
+            byteValue = (byte[])operations.get(buildCacheKey(key));
         } catch (Exception e) {
             LoggerUtils.error(SELF, "get value by cache throw exception",e);
         }
-        return null;
+        return (V) ProtostuffUtil.deserialize(byteValue,SimpleSessionEx.class);
     }
 
     @Override
@@ -48,7 +45,8 @@ public class EhCacheShiroCache<K, V> extends ShiroCache implements Cache<K, V> {
         V previos = get(key);
         try {
             byte[] byteValue = ProtostuffUtil.serialize(value);
-            ehCacheManager.getCache(SHIRO_CACHE_NAME).put(buildCacheKey(key),byteValue);
+            ValueOperations<String,Object> operations = redis.opsForValue();
+            operations.set(buildCacheKey(key),byteValue);
         } catch (Exception e) {
         	 LoggerUtils.error(SELF, "put cache throw exception",e);
         }
@@ -59,7 +57,8 @@ public class EhCacheShiroCache<K, V> extends ShiroCache implements Cache<K, V> {
     public V remove(K key) throws CacheException {
         V previos = get(key);
         try {
-            ehCacheManager.getCache(SHIRO_CACHE_NAME).remove(buildCacheKey(key));
+            ValueOperations<String,Object> operations = redis.opsForValue();
+            operations.getOperations().delete(buildCacheKey(key));
         } catch (Exception e) {
             LoggerUtils.error(SELF, "remove cache  throw exception",e);
         }

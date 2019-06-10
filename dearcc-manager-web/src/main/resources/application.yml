@@ -17,6 +17,10 @@ spring:
   profiles:
     active: dev
 
+my:
+  cacheType: ""
+
+
 
 mapper:
   mappers: com.wolf.dearcc.dao.MyMapper

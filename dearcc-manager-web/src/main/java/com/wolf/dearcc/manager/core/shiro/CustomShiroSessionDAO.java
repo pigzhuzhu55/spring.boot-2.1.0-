@@ -1,6 +1,7 @@
 package com.wolf.dearcc.manager.core.shiro;
 
 import com.wolf.dearcc.common.utils.LoggerUtils;
+import com.wolf.dearcc.manager.core.shiro.bo.SimpleSessionEx;
 import com.wolf.dearcc.manager.core.shiro.session.ShiroSessionRepository;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.UnknownSessionException;
@@ -48,13 +49,15 @@ public class CustomShiroSessionDAO extends AbstractSessionDAO {
     @Override
     protected Serializable doCreate(Session session) {
         Serializable sessionId = this.generateSessionId(session);
-        this.assignSessionId(session, sessionId);
+        ((SimpleSessionEx) session).setId(sessionId.toString());
+        //this.assignSessionId(session, sessionId);
         getShiroSessionRepository().saveSession(session);
         return sessionId;
     }
 
     @Override
     protected Session doReadSession(Serializable sessionId) {
+
         return getShiroSessionRepository().getSession(sessionId);
     }
 }

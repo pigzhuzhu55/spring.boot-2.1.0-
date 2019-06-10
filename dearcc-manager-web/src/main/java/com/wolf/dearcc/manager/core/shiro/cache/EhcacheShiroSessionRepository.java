@@ -2,8 +2,10 @@ package com.wolf.dearcc.manager.core.shiro.cache;
 
 import com.alibaba.fastjson.JSONObject;
 import com.wolf.dearcc.common.utils.LoggerUtils;
+import com.wolf.dearcc.common.utils.ProtostuffUtil;
 import com.wolf.dearcc.common.utils.SerializeUtil;
 import com.alibaba.fastjson.JSON;
+import com.wolf.dearcc.manager.core.shiro.bo.SimpleSessionEx;
 import com.wolf.dearcc.manager.core.shiro.session.CustomSessionManager;
 import com.wolf.dearcc.manager.core.shiro.session.SessionStatus;
 import com.wolf.dearcc.manager.core.shiro.session.ShiroSessionRepository;
@@ -39,8 +41,8 @@ public class EhCacheShiroSessionRepository implements ShiroSessionRepository {
                 session.setAttribute(CustomSessionManager.SESSION_STATUS, sessionStatus);
             }
 
-            LoggerUtils.error(getClass(), JSON.toJSONString(session));
-            byte[] value = SerializeUtil.serialize(session);
+            //LoggerUtils.debug(getClass(), JSON.toJSONString(session));
+            byte[] value = ProtostuffUtil.serialize(session);
             ehCacheManager.getCache(SHIRO_CACHE_NAME).put(key,value);
 
         } catch (Exception e) {
@@ -70,7 +72,7 @@ public class EhCacheShiroSessionRepository implements ShiroSessionRepository {
 
             String key = buildEhCacheSessionKey(sessionId);
             byte[] value = (byte[])ehCacheManager.getCache(SHIRO_CACHE_NAME).get(key);
-            session = SerializeUtil.deserialize(value, Session.class);
+            session = ProtostuffUtil.deserialize(value, SimpleSessionEx.class);
         } catch (Exception e) {
             LoggerUtils.fmtError(getClass(), e, "获取session异常，id:[%s]",sessionId);
         }

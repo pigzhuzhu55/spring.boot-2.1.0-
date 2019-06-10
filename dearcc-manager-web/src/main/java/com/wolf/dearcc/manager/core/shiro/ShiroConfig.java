@@ -1,8 +1,11 @@
 package com.wolf.dearcc.manager.core.shiro;
 
 import com.wolf.dearcc.manager.core.shiro.cache.EhCacheShiroSessionRepository;
+import com.wolf.dearcc.manager.core.shiro.cache.RedisShiroSessionRepository;
+import com.wolf.dearcc.manager.core.shiro.cache.ShiroCacheManager;
 import com.wolf.dearcc.manager.core.shiro.cache.impl.CustomShiroCacheManager;
 import com.wolf.dearcc.manager.core.shiro.cache.impl.EhCacheShiroCacheManager;
+import com.wolf.dearcc.manager.core.shiro.cache.impl.RedisShiroCacheManager;
 import com.wolf.dearcc.manager.core.shiro.filter.LoginFilter;
 import com.wolf.dearcc.manager.core.shiro.listenter.CustomSessionListener;
 import com.wolf.dearcc.manager.core.shiro.session.CustomSessionManager;
@@ -24,8 +27,12 @@ import org.apache.shiro.web.filter.authc.PassThruAuthenticationFilter;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.servlet.SimpleCookie;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import javax.servlet.Filter;
 import java.io.IOException;
@@ -34,6 +41,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 
 /**
+ *
  *
  */
 @Configuration
@@ -47,7 +55,7 @@ public class ShiroConfig {
 	}
 
 	@Bean
-    ShiroFilterFactoryBean shiroFilterFactoryBean(SecurityManager securityManager) {
+	ShiroFilterFactoryBean shiroFilterFactoryBean(SecurityManager securityManager) {
 		ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
 		shiroFilterFactoryBean.setSecurityManager(securityManager);
 		shiroFilterFactoryBean.setLoginUrl("/login");
@@ -101,7 +109,7 @@ public class ShiroConfig {
 
 	/**
 	 * 开启shiro aop注解支持. 使用代理方式;所以需要开启代码支持;
-	 * 
+	 *
 	 * @param securityManager
 	 * @return
 	 */
@@ -112,27 +120,20 @@ public class ShiroConfig {
 		return authorizationAttributeSourceAdvisor;
 	}
 
-	@Bean
-	public CustomShiroCacheManager customShiroCacheManager(){
-		CustomShiroCacheManager customShiroCacheManager = new CustomShiroCacheManager();
-		customShiroCacheManager.setShiroCacheManager(ehCacheShiroCacheManager());
-		return customShiroCacheManager;
-	}
-
-	@Bean
-	public EhCacheShiroCacheManager ehCacheShiroCacheManager(){
-
-		return new EhCacheShiroCacheManager();
-	}
 
 
-	@Bean
-	public CustomShiroSessionDAO customShiroSessionDAO() {
-		CustomShiroSessionDAO customShiroSessionDAO = new CustomShiroSessionDAO();
-		customShiroSessionDAO.setShiroSessionRepository(ehCacheShiroSessionRepository());
-		customShiroSessionDAO.setSessionIdGenerator(sessionIdGenerator());
-		return customShiroSessionDAO;
-	}
+
+
+
+
+
+
+
+
+	@Value("${my.cacheType}")
+	private String cacheType;
+
+
 
 	@Bean
 	public SessionIdGenerator sessionIdGenerator(){
@@ -140,8 +141,25 @@ public class ShiroConfig {
 	}
 
 	@Bean
-	public ShiroSessionRepository ehCacheShiroSessionRepository(){
+	public ShiroSessionRepository shiroSessionRepository(){
+		if(cacheType.equals("redis")){
+			return new RedisShiroSessionRepository();
+		}
 		return new EhCacheShiroSessionRepository();
+	}
+
+	@Bean
+	public ShiroCacheManager shiroCacheManager(){
+
+		if(cacheType.equals("redis")){
+			RedisShiroCacheManager redisShiroCacheManager = new RedisShiroCacheManager();
+			redisShiroCacheManager.setRedisTemplate(redis1);
+			return redisShiroCacheManager;
+		}
+
+		EhCacheShiroCacheManager ehCacheShiroCacheManager = new EhCacheShiroCacheManager();
+		ehCacheShiroCacheManager.setEhCacheManager(ehCacheManager());
+		return ehCacheShiroCacheManager;
 	}
 
 
@@ -156,6 +174,8 @@ public class ShiroConfig {
 
 		//设置在cookie中的sessionId名称
 		sessionManager.setSessionIdCookie(simpleCookie());
+
+		sessionManager.setSessionFactory(new SimpleSessionExFactory());
 
 		Collection<SessionListener> listeners = new ArrayList<SessionListener>();
 		listeners.add(new CustomSessionListener());
@@ -172,6 +192,9 @@ public class ShiroConfig {
 		return simpleCookie;
 	}
 
+	@Autowired
+	@Qualifier("redisTemplate")
+	private RedisTemplate redis1;
 
 	@Bean
 	public EhCacheManager ehCacheManager() {
@@ -197,10 +220,38 @@ public class ShiroConfig {
 		return cacheManager;
 	}
 
+
+
+	/**
+	 *
+	 */
+	@Bean
+	public CustomShiroCacheManager customShiroCacheManager(){
+		CustomShiroCacheManager customShiroCacheManager = new CustomShiroCacheManager();
+		customShiroCacheManager.setShiroCacheManager(shiroCacheManager());
+		return customShiroCacheManager;
+	}
+
+
+	/**
+	 *
+	 */
+	@Bean
+	public CustomShiroSessionDAO customShiroSessionDAO() {
+		CustomShiroSessionDAO customShiroSessionDAO = new CustomShiroSessionDAO();
+		customShiroSessionDAO.setShiroSessionRepository(shiroSessionRepository());
+		customShiroSessionDAO.setSessionIdGenerator(sessionIdGenerator());
+		return customShiroSessionDAO;
+	}
+
+
+	/**
+	 *
+	 */
 	@Bean
 	public CustomSessionManager customSessionManager(){
 		CustomSessionManager customSessionManager = new CustomSessionManager();
-		customSessionManager.setShiroSessionRepository(ehCacheShiroSessionRepository());
+		customSessionManager.setShiroSessionRepository(shiroSessionRepository());
 		customSessionManager.setCustomShiroSessionDAO(customShiroSessionDAO());
 		return customSessionManager;
 	}
