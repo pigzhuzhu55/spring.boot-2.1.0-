@@ -71,8 +71,8 @@ public class RedisShiroSessionRepository implements ShiroSessionRepository {
                  sessionStatus = (SessionStatus)sessionStatusObj;
             }
 
-            //避免频繁写入session到redis造成的性能问题，10分钟最多写一次
-            if (isNew||(DateUtils.addtime(sessionStatus.getLastWriteTime(), 12, 10).getTime() - new java.util.Date().getTime()) < 0) {
+            //避免频繁写入session到redis造成的性能问题，1分钟最多写一次
+            if (isNew||(DateUtils.addtime(sessionStatus.getLastWriteTime(), 12, 1).getTime() - new java.util.Date().getTime()) < 0) {
                 sessionStatus.setLastWriteTime(new java.util.Date());
                 byte[] value = ProtostuffUtil.serialize(session);
                 opsForValue.set(key, Base64.getEncoder().encodeToString(value), session.getTimeout(), TimeUnit.MILLISECONDS);
