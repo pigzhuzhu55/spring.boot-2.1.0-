@@ -24,12 +24,6 @@ public class TokenManager {
     //用户session管理
     public static final CustomSessionManager customSessionManager = SpringContextUtil.getBean("customSessionManager",CustomSessionManager.class);
 
-//    @Autowired
-//    private static SampleRealm sampleRealm;
-//
-//    @Autowired
-//    public static CustomSessionManager customSessionManager;
-
     /**
      * 获取当前登录的用户User对象
      * @return
@@ -38,7 +32,6 @@ public class TokenManager {
         PtUser token = (PtUser)SecurityUtils.getSubject().getPrincipal();
         return token ;
     }
-
 
 
     /**
@@ -62,6 +55,30 @@ public class TokenManager {
     public static Integer getUserId(){
         return getToken()==null?null:getToken().getId();
     }
+
+    /**
+     * 通过用户ID得到SessionId
+     * @return
+     */
+    public static String getSessionId(){
+        Integer userId = getUserId();
+        return userId==null?null:customSessionManager.getSessionId(userId);
+    }
+
+    public static void deleteSessionId() {
+        Integer userId = getUserId();
+        if(userId!=null) {
+            customSessionManager.deleteSessionId(userId);
+        }
+    }
+
+    public static void setSessionId(String sessionId) {
+        Integer userId = getUserId();
+        if (userId != null) {
+            customSessionManager.setSessionId(userId, sessionId);
+        }
+    }
+
     /**
      * 把值放入到当前登录用户的Session里
      * @param key

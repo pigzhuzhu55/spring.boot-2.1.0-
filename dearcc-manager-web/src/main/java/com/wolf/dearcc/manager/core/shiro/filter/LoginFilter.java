@@ -38,7 +38,7 @@ public class LoginFilter extends AccessControlFilter {
 
 
 			//互踢
-			Object singleSessionId = TokenManager.customSessionManager.getShiroSessionRepository().getSessonId(TokenManager.getSession().getId().toString());
+			Object singleSessionId = TokenManager.getSessionId();
 			String sessionId = SecurityUtils.getSubject().getSession().getId().toString();
 			if (singleSessionId != null && !sessionId.equals(singleSessionId.toString())) {
 				ShiroFilterUtils.out(response, ApiResult.Fail("您的账号在别处登陆！"));

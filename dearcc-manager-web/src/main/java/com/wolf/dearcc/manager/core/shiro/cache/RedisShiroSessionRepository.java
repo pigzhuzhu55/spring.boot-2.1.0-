@@ -1,6 +1,7 @@
 package com.wolf.dearcc.manager.core.shiro.cache;
 
 import com.github.pagehelper.util.StringUtil;
+import com.wolf.dearcc.common.utils.DateUtils;
 import com.wolf.dearcc.common.utils.LoggerUtils;
 import com.wolf.dearcc.common.utils.ProtostuffUtil;
 import com.wolf.dearcc.manager.core.shiro.bo.SimpleSessionEx;
@@ -20,12 +21,13 @@ import javax.annotation.PostConstruct;
 import java.io.Serializable;
 import java.util.Base64;
 import java.util.Collection;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 /**
  * Session 管理
- * @author sojson.com
  *
+ * @author sojson.com
  */
 @SuppressWarnings("unchecked")
 public class RedisShiroSessionRepository implements ShiroSessionRepository {
@@ -38,8 +40,8 @@ public class RedisShiroSessionRepository implements ShiroSessionRepository {
 
     private HashOperations<String, String, Object> opsForHash;
 
-    public RedisShiroSessionRepository(RedisTemplate redis){
-        this.redis=redis;
+    public RedisShiroSessionRepository(RedisTemplate redis) {
+        this.redis = redis;
     }
 
     @PostConstruct
@@ -48,13 +50,6 @@ public class RedisShiroSessionRepository implements ShiroSessionRepository {
         opsForHash = redis.opsForHash();
     }
 
-    public RedisTemplate getRedisTemplate() {
-        return redis;
-    }
-
-    public void setRedisTemplate(RedisTemplate redis) {
-        this.redis = redis;
-    }
 
     @Override
     public void saveSession(Session session) {
@@ -64,17 +59,27 @@ public class RedisShiroSessionRepository implements ShiroSessionRepository {
             String key = buildRedisSessionKey(session.getId());
 
             //不存在才添加。
-            if(null == session.getAttribute(CustomSessionManager.SESSION_STATUS)){
-            	//Session 踢出自存存储。
-            	SessionStatus sessionStatus = new SessionStatus();
-            	session.setAttribute(CustomSessionManager.SESSION_STATUS, sessionStatus);
+            SessionStatus sessionStatus;
+            Object sessionStatusObj = session.getAttribute(CustomSessionManager.SESSION_STATUS);
+            if (null == sessionStatusObj) {
+                //Session 踢出自存存储。
+                sessionStatus = new SessionStatus();
+                session.setAttribute(CustomSessionManager.SESSION_STATUS, sessionStatus);
             }
-            
-            byte[] value = ProtostuffUtil.serialize(session);
+            else
+            {
+                 sessionStatus = (SessionStatus)sessionStatusObj;
+            }
 
-            opsForValue.set(key, Base64.getEncoder().encodeToString(value),session.getTimeout(), TimeUnit.MILLISECONDS);
+            //避免频繁写入session到redis造成的性能问题，10分钟最多写一次
+            if (sessionStatus.getLoginNew()||(DateUtils.addtime(sessionStatus.getLastWriteTime(), 12, 10).getTime() - new java.util.Date().getTime()) < 100) {
+                sessionStatus.setLastWriteTime(new java.util.Date());
+                byte[] value = ProtostuffUtil.serialize(session);
+                sessionStatus.setLoginNew(Boolean.FALSE);
+                opsForValue.set(key, Base64.getEncoder().encodeToString(value), session.getTimeout(), TimeUnit.MILLISECONDS);
+            }
         } catch (Exception e) {
-        	LoggerUtils.fmtError(getClass(), e, "save session error，id:[%s]",session.getId());
+            LoggerUtils.fmtError(getClass(), e, "save session error，id:[%s]", session.getId());
         }
     }
 
@@ -87,21 +92,21 @@ public class RedisShiroSessionRepository implements ShiroSessionRepository {
             opsForValue.getOperations().delete(buildRedisSessionKey(id));
 
         } catch (Exception e) {
-        	LoggerUtils.fmtError(getClass(), e, "删除session出现异常，id:[%s]",id);
+            LoggerUtils.fmtError(getClass(), e, "删除session出现异常，id:[%s]", id);
         }
     }
 
-   
-	@Override
+
+    @Override
     public Session getSession(Serializable id) {
         if (id == null)
-        	 throw new NullPointerException("session id is empty");
+            throw new NullPointerException("session id is empty");
         Session session = null;
         try {
             String value = opsForValue.get(buildRedisSessionKey(id));
             session = ProtostuffUtil.deserialize(Base64.getDecoder().decode(value), SimpleSessionEx.class);
         } catch (Exception e) {
-        	LoggerUtils.fmtError(getClass(), e, "获取session异常，id:[%s]",id);
+            LoggerUtils.fmtError(getClass(), e, "获取session异常，id:[%s]", id);
         }
         return session;
     }
@@ -116,19 +121,19 @@ public class RedisShiroSessionRepository implements ShiroSessionRepository {
     }
 
     @Override
-    public String getSessonId(String userId){
-        Object o = opsForHash.get(SHIRO_SESSION_PRE_ALL, userId);
-        return o==null? "": o.toString();
+    public String getSessonId(Integer userId) {
+        Object o = opsForHash.get(SHIRO_SESSION_PRE_ALL, userId.toString());
+        return o == null ? "" : o.toString();
     }
 
     @Override
-    public void deleteSessionId(String userId) {
-        opsForHash.delete(SHIRO_SESSION_PRE_ALL,userId);
+    public void deleteSessionId(Integer userId) {
+        opsForHash.delete(SHIRO_SESSION_PRE_ALL, userId.toString());
     }
 
     @Override
-    public void setSessionId(String userId,String sessionId){
-        opsForHash.put(SHIRO_SESSION_PRE_ALL,userId,sessionId);
+    public void setSessionId(Integer userId, String sessionId) {
+        opsForHash.put(SHIRO_SESSION_PRE_ALL, userId.toString(), sessionId);
     }
 
 }

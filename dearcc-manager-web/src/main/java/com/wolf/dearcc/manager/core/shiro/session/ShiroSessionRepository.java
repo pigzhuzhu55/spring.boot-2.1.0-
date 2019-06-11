@@ -38,7 +38,7 @@ public interface ShiroSessionRepository {
      */
     Collection<Session> getAllSessions();
 
-    String getSessonId(String userId);
-    void deleteSessionId(String userId);
-    void setSessionId(String userId,String sessionId);
+    String getSessonId(Integer userId);
+    void deleteSessionId(Integer userId);
+    void setSessionId(Integer userId,String sessionId);
 }

@@ -81,8 +81,19 @@ public class CustomSessionManager {
 		return list;
 	}
 	
-	
-	
+	public String getSessionId(Integer userId){
+		return shiroSessionRepository.getSessonId(userId);
+	}
+
+	public void deleteSessionId(Integer userId) {
+		shiroSessionRepository.deleteSessionId(userId);
+	}
+
+	public void setSessionId(Integer userId,String sessionId){
+		shiroSessionRepository.setSessionId(userId,sessionId);
+	}
+
+
 	/**
 	 * 获取单个Session
 	 * @param sessionId

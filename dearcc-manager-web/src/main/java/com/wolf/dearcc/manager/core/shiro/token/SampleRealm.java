@@ -1,6 +1,8 @@
 package com.wolf.dearcc.manager.core.shiro.token;
 
 import com.wolf.dearcc.common.utils.StringUtils;
+import com.wolf.dearcc.manager.core.shiro.session.CustomSessionManager;
+import com.wolf.dearcc.manager.core.shiro.session.SessionStatus;
 import com.wolf.dearcc.manager.core.shiro.session.ShiroSessionRepository;
 import com.wolf.dearcc.manager.core.shiro.token.manager.TokenManager;
 import com.wolf.dearcc.pojo.PtUser;
@@ -70,14 +72,16 @@ public class SampleRealm extends AuthorizingRealm {
 		}
 		SimpleAuthenticationInfo sai = new SimpleAuthenticationInfo(user,user.getPassword(), getName());
 
-		String sessionId = SecurityUtils.getSubject().getSession().getId().toString();
-
 		//互踢
-		String singleSessionId = TokenManager.customSessionManager.getShiroSessionRepository().getSessonId(user.getId().toString());
+		String sessionId = TokenManager.getSession().getId().toString();
+		String singleSessionId = TokenManager.getSessionId();
 		if (StringUtils.isNotBlank(singleSessionId) && !sessionId.equals(singleSessionId)) {
-			TokenManager.customSessionManager.getShiroSessionRepository().deleteSession(user.getId().toString());
+
+			SessionStatus sessionStatus = (SessionStatus)TokenManager.getSession().getAttribute(CustomSessionManager.SESSION_STATUS);
+			sessionStatus.setLoginNew(Boolean.TRUE);
+			TokenManager.deleteSessionId();
 		}
-		TokenManager.customSessionManager.getShiroSessionRepository().setSessionId(user.getId().toString(),sessionId);
+		TokenManager.setSessionId(sessionId);
 
 		return  sai;
     }

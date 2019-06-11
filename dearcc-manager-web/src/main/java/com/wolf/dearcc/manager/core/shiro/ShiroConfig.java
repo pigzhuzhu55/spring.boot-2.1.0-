@@ -9,6 +9,7 @@ import com.wolf.dearcc.manager.core.shiro.cache.impl.RedisShiroCacheManager;
 import com.wolf.dearcc.manager.core.shiro.filter.LoginFilter;
 import com.wolf.dearcc.manager.core.shiro.listenter.CustomSessionListener;
 import com.wolf.dearcc.manager.core.shiro.session.CustomSessionManager;
+import com.wolf.dearcc.manager.core.shiro.session.ShiroSessionManager;
 import com.wolf.dearcc.manager.core.shiro.session.ShiroSessionRepository;
 import com.wolf.dearcc.manager.core.shiro.token.SampleRealm;
 import net.sf.ehcache.CacheManager;
@@ -58,7 +59,7 @@ public class ShiroConfig {
 	ShiroFilterFactoryBean shiroFilterFactoryBean(SecurityManager securityManager) {
 		ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
 		shiroFilterFactoryBean.setSecurityManager(securityManager);
-		shiroFilterFactoryBean.setLoginUrl("/login");
+		shiroFilterFactoryBean.setLoginUrl("/api/none/sign/in");
 		shiroFilterFactoryBean.setSuccessUrl("/index");
 		shiroFilterFactoryBean.setUnauthorizedUrl("/403");
 		LinkedHashMap<String, Filter> filter = new LinkedHashMap<>();
@@ -96,12 +97,12 @@ public class ShiroConfig {
 		DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
 		// 设置realm.
 		securityManager.setRealm(sampleRealm());
-		securityManager.setSessionManager(sessionManager());
 		securityManager.setCacheManager(customShiroCacheManager());
+		securityManager.setSessionManager(sessionManager());
 		return securityManager;
 	}
 
-	@Bean(name="sampleRealm")
+	@Bean
 	SampleRealm sampleRealm() {
 		SampleRealm sampleRealm = new SampleRealm();
 		return sampleRealm;
@@ -119,15 +120,6 @@ public class ShiroConfig {
 		authorizationAttributeSourceAdvisor.setSecurityManager(securityManager);
 		return authorizationAttributeSourceAdvisor;
 	}
-
-
-
-
-
-
-
-
-
 
 
 	@Value("${my.cacheType}")
@@ -167,8 +159,8 @@ public class ShiroConfig {
 	 * shiro session的管理
 	 */
 	@Bean
-	public DefaultSessionManager sessionManager() {
-		DefaultWebSessionManager sessionManager = new DefaultWebSessionManager();
+	public DefaultWebSessionManager sessionManager() {
+		DefaultWebSessionManager sessionManager = new ShiroSessionManager();
 		sessionManager.setGlobalSessionTimeout(tomcatTimeout * 1000);
 		sessionManager.setSessionDAO(customShiroSessionDAO());
 
@@ -248,7 +240,7 @@ public class ShiroConfig {
 	/**
 	 *
 	 */
-	@Bean(name="customSessionManager")
+	@Bean
 	public CustomSessionManager customSessionManager(){
 		CustomSessionManager customSessionManager = new CustomSessionManager();
 		customSessionManager.setShiroSessionRepository(shiroSessionRepository());

@@ -24,12 +24,6 @@ import javax.validation.Valid;
 @RequestMapping(value = {"/api/none/sign"})
 public class SignController {
 
-    @Autowired
-    @Qualifier("redisTemplate2")
-    private RedisTemplate redis2;
-    @Autowired
-    @Qualifier("redisTemplate")
-    private RedisTemplate redis1;
 
 
     @Autowired
@@ -44,18 +38,12 @@ public class SignController {
     public ApiResult<SignInDto> LoginIn(@RequestBody @Valid SignInForm form) {
 
 
-        ValueOperations<String,Object> operations = redis2.opsForValue();
-        operations.set("test1","12321");
-
-        Object o = operations.get("test1");
-
          PtUser user = ptUserService.queryOneByPrimaryKey(1);
 
-        //byte[] tt =  ProtostuffUtil.serializer(user);
 
          user = TokenManager.login(user, Boolean.TRUE);
 
-        //PtOrganization obj =   ptOrganizationService.queryOneByPrimaryKey(1);
+
 
         return ApiResult.Success(user);
     }
