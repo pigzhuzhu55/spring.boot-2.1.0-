@@ -14,7 +14,7 @@ public interface ShiroSessionRepository {
      *
      * @param session
      */
-    void saveSession(Session session);
+    void saveSession(Session session,Boolean isNew);
 
     /**
      * 删除session

@@ -73,15 +73,16 @@ public class SampleRealm extends AuthorizingRealm {
 		SimpleAuthenticationInfo sai = new SimpleAuthenticationInfo(user,user.getPassword(), getName());
 
 		//互踢
-		String sessionId = TokenManager.getSession().getId().toString();
+		//获取当前用户保存的SessionId，用于互踢，如果为空，说明当前服务器上未登陆该用户
 		String singleSessionId = TokenManager.getSessionId();
-		if (StringUtils.isNotBlank(singleSessionId) && !sessionId.equals(singleSessionId)) {
+		//当前用户的SessionId
+        String sessionId = TokenManager.getSession().getId().toString();
+        //如果sessionId不一样，说明同一个账号登陆多个地方
+		if (StringUtils.isBlank(singleSessionId) || !sessionId.equals(singleSessionId)) {
 
 			SessionStatus sessionStatus = (SessionStatus)TokenManager.getSession().getAttribute(CustomSessionManager.SESSION_STATUS);
-			sessionStatus.setLoginNew(Boolean.TRUE);
-			TokenManager.deleteSessionId();
+			TokenManager.setSessionId(sessionId);
 		}
-		TokenManager.setSessionId(sessionId);
 
 		return  sai;
     }

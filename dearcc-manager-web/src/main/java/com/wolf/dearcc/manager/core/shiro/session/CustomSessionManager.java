@@ -80,7 +80,8 @@ public class CustomSessionManager {
 		}
 		return list;
 	}
-	
+
+
 	public String getSessionId(Integer userId){
 		return shiroSessionRepository.getSessonId(userId);
 	}

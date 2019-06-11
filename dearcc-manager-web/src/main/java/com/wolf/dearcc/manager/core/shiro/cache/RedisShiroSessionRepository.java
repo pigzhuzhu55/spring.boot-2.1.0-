@@ -52,7 +52,7 @@ public class RedisShiroSessionRepository implements ShiroSessionRepository {
 
 
     @Override
-    public void saveSession(Session session) {
+    public void saveSession(Session session,Boolean isNew) {
         if (session == null || session.getId() == null)
             throw new NullPointerException("session is empty");
         try {
@@ -72,12 +72,13 @@ public class RedisShiroSessionRepository implements ShiroSessionRepository {
             }
 
             //避免频繁写入session到redis造成的性能问题，10分钟最多写一次
-            if (sessionStatus.getLoginNew()||(DateUtils.addtime(sessionStatus.getLastWriteTime(), 12, 10).getTime() - new java.util.Date().getTime()) < 100) {
+            if (isNew||(DateUtils.addtime(sessionStatus.getLastWriteTime(), 12, 10).getTime() - new java.util.Date().getTime()) < 0) {
                 sessionStatus.setLastWriteTime(new java.util.Date());
                 byte[] value = ProtostuffUtil.serialize(session);
-                sessionStatus.setLoginNew(Boolean.FALSE);
                 opsForValue.set(key, Base64.getEncoder().encodeToString(value), session.getTimeout(), TimeUnit.MILLISECONDS);
             }
+
+
         } catch (Exception e) {
             LoggerUtils.fmtError(getClass(), e, "save session error，id:[%s]", session.getId());
         }

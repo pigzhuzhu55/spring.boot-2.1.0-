@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class TokenManager {
     //用户登录管理
-    public static final SampleRealm sampleRealm = SpringContextUtil.getBean("sampleRealm",SampleRealm.class);
+    private static SampleRealm sampleRealm = SpringContextUtil.getBean("sampleRealm",SampleRealm.class);
     //用户session管理
     public static final CustomSessionManager customSessionManager = SpringContextUtil.getBean("customSessionManager",CustomSessionManager.class);
 
@@ -56,8 +56,9 @@ public class TokenManager {
         return getToken()==null?null:getToken().getId();
     }
 
+
     /**
-     * 通过用户ID得到SessionId
+     * 当前服务器存储的SessionId
      * @return
      */
     public static String getSessionId(){
