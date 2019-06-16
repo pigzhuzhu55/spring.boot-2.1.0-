@@ -19,7 +19,7 @@ import com.wolf.dearcc.common.model.*;
 
 import javax.validation.Valid;
 
-@Api(value="sign",tags={"2、登陆管理"},position = 2)
+@Api(value="sign",tags={"1、登陆管理"},position = 1)
 @RestController
 @RequestMapping(value = {"/api/none/sign"})
 public class SignController {
@@ -35,7 +35,7 @@ public class SignController {
     @ApiOperation(value = "登陆系统")
     @RequestMapping(value = "/in",method = RequestMethod.POST)
     @ResponseBody()
-    public ApiResult<SignInDto> LoginIn(@RequestBody @Valid SignInForm form) {
+    public ApiResult<SignInDto> loginIn(@RequestBody @Valid SignInForm form) {
 
 
          PtUser user = ptUserService.queryOneByPrimaryKey(1);
@@ -45,18 +45,9 @@ public class SignController {
 
 
 
-        return ApiResult.Success(user);
-    }
 
-    @ApiOperation(value = "获取用户信息")
-    @RequestMapping(value = "/one",method = RequestMethod.GET)
-    @ResponseBody()
-    public ApiResult<PtUser> oNE() {
-
-        PtUser user = ptUserService.queryOneByPrimaryKey(1);
-
-        //PtOrganization obj =   ptOrganizationService.queryOneByPrimaryKey(1);
 
         return ApiResult.Success(user);
     }
+
 }

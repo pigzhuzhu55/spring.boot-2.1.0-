@@ -45,11 +45,11 @@ public class LoginFilter extends AccessControlFilter {
 			//如果sessionId不一样，说明同一个账号登陆多个地方
 			if (StringUtils.isNotBlank(singleSessionId) && !sessionId.equals(singleSessionId)) {
 				ShiroFilterUtils.out(response, ApiResult.Fail("您的账号在别处登陆！"));
-				return Boolean.FALSE;
+				return false;
 			}
 
 
-			return Boolean.TRUE;
+			return true;
         }
 
 
@@ -58,7 +58,7 @@ public class LoginFilter extends AccessControlFilter {
 			ShiroFilterUtils.out(response, ApiResult.Fail("当前用户没有登录"));
 		}
 
-		return Boolean.FALSE ;
+		return false ;
 
 	}
 
@@ -69,7 +69,7 @@ public class LoginFilter extends AccessControlFilter {
 			//保存Request和Response 到登录后的链接
 			saveRequestAndRedirectToLogin(request, response);
 		}
-		return Boolean.FALSE ;
+		return false;
 	}
 
 }

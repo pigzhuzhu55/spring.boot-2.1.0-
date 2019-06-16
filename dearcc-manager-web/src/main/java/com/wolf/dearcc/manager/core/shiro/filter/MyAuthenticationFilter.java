@@ -16,12 +16,12 @@ public class MyAuthenticationFilter extends AccessControlFilter {
             }
         }
 
-        return false;
+        return true;
     }
 
     @Override
     protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
         ShiroFilterUtils.out(response, ApiResult.Fail("权限不足！"));
-        return false;
+        return true;
     }
 }
