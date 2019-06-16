@@ -8,6 +8,7 @@ package com.wolf.dearcc.dao.mapper.source1;
 
 import com.wolf.dearcc.dao.MyMapper;
 import com.wolf.dearcc.pojo.PtPermission;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Component;
 
@@ -25,5 +26,5 @@ public interface PtPermissionMapper extends MyMapper<PtPermission> {
             " where ur.user_id = ${userId}" +
             " and p.id = rp.permission_id" +
             " and rp.role_id = ur.role_id")
-    Set<String> findPermissionByUserId(Integer userId);
+     Set<String> findPermissionByUserId(@Param("userId") Integer userId);
 }

@@ -31,6 +31,7 @@ public class TokenManager {
     public static PtUser getToken(){
         PtUser token = (PtUser)SecurityUtils.getSubject().getPrincipal();
         return token ;
+
     }
 
 

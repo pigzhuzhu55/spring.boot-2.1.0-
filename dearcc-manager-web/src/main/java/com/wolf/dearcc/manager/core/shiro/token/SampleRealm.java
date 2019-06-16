@@ -88,7 +88,7 @@ public class SampleRealm extends AuthorizingRealm {
     }
 
 	 /** 
-     * 授权 
+     * 授权 每次请求授权验证，这个方法都要执行一遍，感觉shiro的设计真是不考虑任何性能啊~~
      */  
     @Override  
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
