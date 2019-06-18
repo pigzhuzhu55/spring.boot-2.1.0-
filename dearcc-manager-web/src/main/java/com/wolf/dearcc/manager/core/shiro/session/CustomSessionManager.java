@@ -3,8 +3,8 @@ package com.wolf.dearcc.manager.core.shiro.session;
 import com.wolf.dearcc.common.utils.LoggerUtils;
 import com.wolf.dearcc.common.utils.StringUtils;
 import com.wolf.dearcc.manager.core.shiro.CustomShiroSessionDAO;
+import com.wolf.dearcc.manager.core.shiro.bo.UUser;
 import com.wolf.dearcc.manager.core.shiro.bo.UserOnlineBo;
-import com.wolf.dearcc.pojo.PtUser;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.support.DefaultSubjectContext;
@@ -69,8 +69,8 @@ public class CustomSessionManager {
 				SimplePrincipalCollection spc = (SimplePrincipalCollection)obj;
 				//判断用户，匹配用户ID。
 				obj = spc.getPrimaryPrincipal();
-				if(null != obj && obj instanceof PtUser){
-					PtUser user = (PtUser)obj;
+				if(null != obj && obj instanceof UUser){
+					UUser user = (UUser)obj;
 					//比较用户ID，符合即加入集合
 					if(null != user && idset.contains(user.getId())){
 						list.add(spc);
@@ -119,9 +119,9 @@ public class CustomSessionManager {
 			 * return new SimpleAuthenticationInfo(user,user.getPswd(), getName());的user 对象。
 			 */
 			obj = spc.getPrimaryPrincipal();
-			if(null != obj && obj instanceof PtUser){
+			if(null != obj && obj instanceof UUser){
 				//存储session + user 综合信息
-				UserOnlineBo userBo = new UserOnlineBo((PtUser)obj);
+				UserOnlineBo userBo = new UserOnlineBo((UUser)obj);
 				//最后一次和系统交互的时间
 				userBo.setLastAccess(session.getLastAccessTime());
 				//主机的ip地址

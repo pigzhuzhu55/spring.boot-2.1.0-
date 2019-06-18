@@ -25,6 +25,7 @@ public class UserController {
     @ApiOperation(value = "获取用户信息")
     @RequestMapping(value = "/one",method = RequestMethod.GET)
     @ResponseBody()
+    @RequiresPermissions("lesson:curriculum:add")
     public ApiResult<PtUser> one() {
 
         PtUser user = ptUserService.queryOneByPrimaryKey(1);

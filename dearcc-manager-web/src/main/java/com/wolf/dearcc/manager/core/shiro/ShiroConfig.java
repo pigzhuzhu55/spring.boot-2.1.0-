@@ -13,17 +13,11 @@ import com.wolf.dearcc.manager.core.shiro.session.ShiroSessionManager;
 import com.wolf.dearcc.manager.core.shiro.session.ShiroSessionRepository;
 import com.wolf.dearcc.manager.core.shiro.token.SampleRealm;
 import net.sf.ehcache.CacheManager;
-import org.apache.shiro.authc.pam.AtLeastOneSuccessfulStrategy;
-import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
-import org.apache.shiro.codec.Base64;
 import org.apache.shiro.io.ResourceUtils;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.session.SessionListener;
-import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.apache.shiro.session.mgt.ExecutorServiceSessionValidationScheduler;
-import org.apache.shiro.session.mgt.eis.MemorySessionDAO;
-import org.apache.shiro.session.mgt.eis.SessionDAO;
 import org.apache.shiro.session.mgt.eis.SessionIdGenerator;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
@@ -69,7 +63,6 @@ public class ShiroConfig {
 		//shiroFilterFactoryBean.setUnauthorizedUrl("/403");
 		LinkedHashMap<String, Filter> filter = new LinkedHashMap<>();
 		filter.put("loginFilter", new LoginFilter());
-		//filter.put("perms", new ShiroPermissionsFilter());
 		shiroFilterFactoryBean.setFilters(filter);
 		LinkedHashMap<String, String> filterChainDefinitionMap = new LinkedHashMap<>();
 		// 配置不会被拦截的链接
@@ -86,6 +79,8 @@ public class ShiroConfig {
 
 
 		filterChainDefinitionMap.put("/**", "loginFilter");
+
+
 		shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
 
 		return shiroFilterFactoryBean;

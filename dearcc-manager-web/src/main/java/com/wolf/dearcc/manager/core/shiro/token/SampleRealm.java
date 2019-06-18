@@ -2,6 +2,7 @@ package com.wolf.dearcc.manager.core.shiro.token;
 
 import com.wolf.dearcc.common.utils.StringUtils;
 import com.wolf.dearcc.manager.core.shiro.bo.SimpleSessionEx;
+import com.wolf.dearcc.manager.core.shiro.bo.UUser;
 import com.wolf.dearcc.manager.core.shiro.session.CustomSessionManager;
 import com.wolf.dearcc.manager.core.shiro.session.SessionStatus;
 import com.wolf.dearcc.manager.core.shiro.session.ShiroSessionRepository;
@@ -71,7 +72,9 @@ public class SampleRealm extends AuthorizingRealm {
 			user.setLastLoginTime(new Date());
 			userService.updateByPrimaryKeySelective(user);
 		}
-		SimpleAuthenticationInfo sai = new SimpleAuthenticationInfo(user,user.getPassword(), getName());
+
+		UUser uuser = new UUser(user);
+		SimpleAuthenticationInfo sai = new SimpleAuthenticationInfo(uuser,user.getPassword(), getName());
 
 		//互踢
 		//获取当前用户保存的SessionId，用于互踢，如果为空，说明当前服务器上未登陆该用户
@@ -84,6 +87,13 @@ public class SampleRealm extends AuthorizingRealm {
 			SessionStatus sessionStatus = (SessionStatus)TokenManager.getSession().getAttribute(CustomSessionManager.SESSION_STATUS);
 			TokenManager.setSessionId(sessionId);
 		}
+		//根据用户ID查询角色（role），放入到Authorization里。
+		Set<String> roles = roleService.findRoleByUserId(user.getId());
+		uuser.setRoles(roles);
+		//根据用户ID查询权限（permission），放入到Authorization里。
+		Set<String> permissions = permissionService.findPermissionByUserId(user.getId());
+		uuser.setStringPermissions(permissions);
+
 		return  sai;
     }
 
@@ -93,16 +103,22 @@ public class SampleRealm extends AuthorizingRealm {
     @Override  
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
     	
-    	Integer userId = TokenManager.getUserId();
+    	UUser user = TokenManager.getToken();
 		SimpleAuthorizationInfo info =  new SimpleAuthorizationInfo();
-		//根据用户ID查询角色（role），放入到Authorization里。
-		Set<String> roles = roleService.findRoleByUserId(userId);
-		info.setRoles(roles);
-		//根据用户ID查询权限（permission），放入到Authorization里。
-		Set<String> permissions = permissionService.findPermissionByUserId(userId);
-		info.setStringPermissions(permissions);
+		info.setRoles(user.getRoles());
+		info.setStringPermissions(user.getStringPermissions());
         return info;  
-    }  
+    }
+
+    @Override
+	protected AuthorizationInfo getAuthorizationInfo(PrincipalCollection principals) {
+		if (principals == null) {
+			return null;
+		} else {
+			return doGetAuthorizationInfo(principals);
+		}
+	}
+
     /**
      * 清空当前用户权限信息
      */

@@ -10,16 +10,19 @@ import java.util.Date;
  *
  */
 @Data
-public class UserOnlineBo extends PtUser implements Serializable {
+public class UserOnlineBo extends UUser implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	public UserOnlineBo(PtUser user) {
+		super(user);
+	}
+	public UserOnlineBo(UUser user) {
 		this.setId(user.getId());
 		this.setUserName(user.getUserName());
 		this.setTelephone(user.getTelephone());
 		this.setPassword(user.getPassword());
-		this.setCreateTime(user.getCreateTime());
 		this.setLastLoginTime(user.getLastLoginTime());
+		this.setDeleteFlag(user.getDeleteFlag());
 	}
 	//Session Id
 	private String sessionId;

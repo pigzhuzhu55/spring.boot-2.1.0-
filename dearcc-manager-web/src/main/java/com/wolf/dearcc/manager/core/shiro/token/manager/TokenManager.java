@@ -2,6 +2,7 @@ package com.wolf.dearcc.manager.core.shiro.token.manager;
 
 import java.util.List;
 
+import com.wolf.dearcc.manager.core.shiro.bo.UUser;
 import com.wolf.dearcc.manager.core.shiro.session.CustomSessionManager;
 import com.wolf.dearcc.manager.core.shiro.token.SampleRealm;
 import com.wolf.dearcc.manager.core.shiro.token.ShiroToken;
@@ -28,8 +29,8 @@ public class TokenManager {
      * 获取当前登录的用户User对象
      * @return
      */
-    public static PtUser getToken(){
-        PtUser token = (PtUser)SecurityUtils.getSubject().getPrincipal();
+    public static UUser getToken(){
+        UUser token = (UUser)SecurityUtils.getSubject().getPrincipal();
         return token ;
 
     }
@@ -110,12 +111,9 @@ public class TokenManager {
 
     /**
      * 登录
-     * @param user
-     * @param rememberMe
-     * @return
      */
-    public static PtUser login(PtUser user,Boolean rememberMe){
-        ShiroToken token = new ShiroToken(user.getAccount(), user.getPassword());
+    public static UUser login(String account,String password, Boolean rememberMe){
+        ShiroToken token = new ShiroToken(account, password);
         token.setRememberMe(rememberMe);
         SecurityUtils.getSubject().login(token);
         return getToken();

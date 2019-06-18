@@ -3,6 +3,7 @@ package com.wolf.dearcc.manager.controller.none;
 import com.wolf.dearcc.common.utils.ProtostuffUtil;
 import com.wolf.dearcc.dto.form.SignInForm;
 import com.wolf.dearcc.dto.front.SignInDto;
+import com.wolf.dearcc.manager.core.shiro.bo.UUser;
 import com.wolf.dearcc.manager.core.shiro.token.manager.TokenManager;
 import com.wolf.dearcc.pojo.PtOrganization;
 import com.wolf.dearcc.pojo.PtUser;
@@ -37,11 +38,7 @@ public class SignController {
     @ResponseBody()
     public ApiResult<SignInDto> loginIn(@RequestBody @Valid SignInForm form) {
 
-
-         PtUser user = ptUserService.queryOneByPrimaryKey(1);
-
-        TokenManager.login(user,true);
-
+        UUser user = TokenManager.login(form.getUserName(),form.getPassword(),true);
 
         return ApiResult.Success(user);
     }

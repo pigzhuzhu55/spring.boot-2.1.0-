@@ -3,6 +3,7 @@ package com.wolf.dearcc.manager.core.shiro.filter;
 import com.wolf.dearcc.common.model.ApiResult;
 import com.wolf.dearcc.common.utils.LoggerUtils;
 import com.wolf.dearcc.common.utils.StringUtils;
+import com.wolf.dearcc.manager.core.shiro.bo.UUser;
 import com.wolf.dearcc.manager.core.shiro.session.ShiroSessionRepository;
 import com.wolf.dearcc.manager.core.shiro.token.manager.TokenManager;
 import com.wolf.dearcc.pojo.PtUser;
@@ -32,7 +33,7 @@ public class LoginFilter extends AccessControlFilter {
 	protected boolean isAccessAllowed(ServletRequest request,
                                       ServletResponse response, Object mappedValue) throws Exception {
 
-		PtUser token = TokenManager.getToken();
+		UUser token = TokenManager.getToken();
 
 		if(null != token || isLoginRequest(request, response)){// && isEnabled()
 
