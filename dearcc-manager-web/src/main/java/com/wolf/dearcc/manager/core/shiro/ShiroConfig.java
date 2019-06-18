@@ -13,11 +13,14 @@ import com.wolf.dearcc.manager.core.shiro.session.ShiroSessionManager;
 import com.wolf.dearcc.manager.core.shiro.session.ShiroSessionRepository;
 import com.wolf.dearcc.manager.core.shiro.token.SampleRealm;
 import net.sf.ehcache.CacheManager;
+import org.apache.shiro.authc.pam.AtLeastOneSuccessfulStrategy;
+import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.io.ResourceUtils;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.session.SessionListener;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
+import org.apache.shiro.session.mgt.ExecutorServiceSessionValidationScheduler;
 import org.apache.shiro.session.mgt.eis.MemorySessionDAO;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
 import org.apache.shiro.session.mgt.eis.SessionIdGenerator;
@@ -80,7 +83,7 @@ public class ShiroConfig {
 		filterChainDefinitionMap.put("/api/none/sign/in", "anon");
 
 
-		filterChainDefinitionMap.put("/**", "authc,loginFilter");
+		filterChainDefinitionMap.put("/**", "loginFilter");
 		shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
 
 		return shiroFilterFactoryBean;
@@ -92,14 +95,32 @@ public class ShiroConfig {
 		return filter;
 	}
 
-	@Bean
+	@Bean(name = "securityManager")
 	public SecurityManager securityManager() {
 		DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
+		securityManager.setAuthenticator(authenticator());
 		// 设置realm.
 		securityManager.setRealm(sampleRealm());
 		securityManager.setCacheManager(customShiroCacheManager());
 		securityManager.setSessionManager(sessionManager());
 		return securityManager;
+	}
+
+	/**
+	 * 当只有一个Realm时，就使用这个Realm，当配置了多个Realm时，会使用所有配置的Realm。
+	 *
+	 * @return
+	 */
+	@Bean
+	ModularRealmAuthenticator authenticator() {
+		ModularRealmAuthenticator authenticator = new ModularRealmAuthenticator();
+		authenticator.setAuthenticationStrategy(authenticationStrategy());
+		return authenticator;
+	}
+
+	@Bean
+	AtLeastOneSuccessfulStrategy authenticationStrategy() {
+		return new AtLeastOneSuccessfulStrategy();
 	}
 
 	@Bean
@@ -169,18 +190,36 @@ public class ShiroConfig {
 
 		sessionManager.setSessionFactory(new SimpleSessionExFactory());
 
+		sessionManager.setDeleteInvalidSessions(true);
+		sessionManager.setSessionValidationScheduler(sessionValidationScheduler());
+		sessionManager.setSessionValidationSchedulerEnabled(true);
+
+
 		Collection<SessionListener> listeners = new ArrayList<SessionListener>();
 		listeners.add(new CustomSessionListener());
 		sessionManager.setSessionListeners(listeners);
 		return sessionManager;
 	}
 
+	/**
+	 * 处理session有效期
+	 *
+	 * @return
+	 */
+	@Bean
+	public ExecutorServiceSessionValidationScheduler sessionValidationScheduler() {
+		ExecutorServiceSessionValidationScheduler sessionValidationScheduler = new ExecutorServiceSessionValidationScheduler();
+		sessionValidationScheduler.setInterval(1800000);
+		return sessionValidationScheduler;
+	}
+
+
 	@Bean
 	public SimpleCookie simpleCookie(){
 
 		SimpleCookie simpleCookie = new SimpleCookie();
 		simpleCookie.setName("shiro.session.id");
-
+		simpleCookie.setPath("/");
 		return simpleCookie;
 	}
 

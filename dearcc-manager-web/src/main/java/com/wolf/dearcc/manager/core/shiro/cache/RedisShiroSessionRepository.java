@@ -11,6 +11,7 @@ import com.wolf.dearcc.manager.core.shiro.session.ShiroSessionRepository;
 import com.wolf.dearcc.manager.core.shiro.token.manager.TokenManager;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.session.Session;
+import org.apache.shiro.session.mgt.ValidatingSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.HashOperations;
@@ -56,8 +57,12 @@ public class RedisShiroSessionRepository implements ShiroSessionRepository {
         if (session == null || session.getId() == null)
             throw new NullPointerException("session is empty");
         try {
-            String key = buildRedisSessionKey(session.getId());
+            //如果会话过期/停止 没必要再更新了
+            if (session instanceof ValidatingSession && !((ValidatingSession) session).isValid()) {
+                return;
+            }
 
+            String key = buildRedisSessionKey(session.getId());
             //不存在才添加。
             SessionStatus sessionStatus;
             Object sessionStatusObj = session.getAttribute(CustomSessionManager.SESSION_STATUS);
