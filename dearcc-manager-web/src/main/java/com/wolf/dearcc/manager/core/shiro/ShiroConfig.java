@@ -16,6 +16,7 @@ import net.sf.ehcache.CacheManager;
 import org.apache.shiro.authc.pam.AtLeastOneSuccessfulStrategy;
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
+import org.apache.shiro.codec.Base64;
 import org.apache.shiro.io.ResourceUtils;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.session.SessionListener;
@@ -28,6 +29,7 @@ import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.filter.authc.PassThruAuthenticationFilter;
+import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.servlet.SimpleCookie;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
@@ -98,29 +100,13 @@ public class ShiroConfig {
 	@Bean(name = "securityManager")
 	public SecurityManager securityManager() {
 		DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
-		securityManager.setAuthenticator(authenticator());
-		// 设置realm.
+
 		securityManager.setRealm(sampleRealm());
-		securityManager.setCacheManager(customShiroCacheManager());
 		securityManager.setSessionManager(sessionManager());
+		securityManager.setCacheManager(customShiroCacheManager());
+		securityManager.setRememberMeManager(rememberMeManager());
+
 		return securityManager;
-	}
-
-	/**
-	 * 当只有一个Realm时，就使用这个Realm，当配置了多个Realm时，会使用所有配置的Realm。
-	 *
-	 * @return
-	 */
-	@Bean
-	ModularRealmAuthenticator authenticator() {
-		ModularRealmAuthenticator authenticator = new ModularRealmAuthenticator();
-		authenticator.setAuthenticationStrategy(authenticationStrategy());
-		return authenticator;
-	}
-
-	@Bean
-	AtLeastOneSuccessfulStrategy authenticationStrategy() {
-		return new AtLeastOneSuccessfulStrategy();
 	}
 
 	@Bean
@@ -145,8 +131,6 @@ public class ShiroConfig {
 
 	@Value("${my.cacheType}")
 	private String cacheType;
-
-
 
 	@Bean
 	public SessionIdGenerator sessionIdGenerator(){
@@ -186,7 +170,8 @@ public class ShiroConfig {
 		sessionManager.setSessionDAO(customShiroSessionDAO());
 
 		//设置在cookie中的sessionId名称
-		sessionManager.setSessionIdCookie(simpleCookie());
+		sessionManager.setSessionIdCookie(sessionIdCookie());
+
 
 		sessionManager.setSessionFactory(new SimpleSessionExFactory());
 
@@ -215,12 +200,26 @@ public class ShiroConfig {
 
 
 	@Bean
-	public SimpleCookie simpleCookie(){
+	public SimpleCookie sessionIdCookie(){
 
-		SimpleCookie simpleCookie = new SimpleCookie();
-		simpleCookie.setName("shiro.session.id");
-		simpleCookie.setPath("/");
+		SimpleCookie simpleCookie = new SimpleCookie("ssid");
+		simpleCookie.setHttpOnly(true);
+		simpleCookie.setMaxAge(-1);//表示浏览器关闭时失效此Cookie
 		return simpleCookie;
+	}
+	@Bean
+	public SimpleCookie rememberMeCookie(){
+
+		SimpleCookie simpleCookie = new SimpleCookie("rere");
+		simpleCookie.setHttpOnly(true);
+		simpleCookie.setMaxAge(2592000);//30天=2592000
+		return simpleCookie;
+	}
+	@Bean
+	public CookieRememberMeManager rememberMeManager(){
+		CookieRememberMeManager cookieRememberMeManager = new CookieRememberMeManager();
+		cookieRememberMeManager.setCookie(rememberMeCookie());
+		return cookieRememberMeManager;
 	}
 
 	@Autowired
@@ -250,7 +249,6 @@ public class ShiroConfig {
 		}
 		return cacheManager;
 	}
-
 
 
 	/**

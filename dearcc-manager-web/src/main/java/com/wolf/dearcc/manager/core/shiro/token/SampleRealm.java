@@ -1,6 +1,7 @@
 package com.wolf.dearcc.manager.core.shiro.token;
 
 import com.wolf.dearcc.common.utils.StringUtils;
+import com.wolf.dearcc.manager.core.shiro.bo.SimpleSessionEx;
 import com.wolf.dearcc.manager.core.shiro.session.CustomSessionManager;
 import com.wolf.dearcc.manager.core.shiro.session.SessionStatus;
 import com.wolf.dearcc.manager.core.shiro.session.ShiroSessionRepository;
@@ -83,7 +84,6 @@ public class SampleRealm extends AuthorizingRealm {
 			SessionStatus sessionStatus = (SessionStatus)TokenManager.getSession().getAttribute(CustomSessionManager.SESSION_STATUS);
 			TokenManager.setSessionId(sessionId);
 		}
-
 		return  sai;
     }
 
