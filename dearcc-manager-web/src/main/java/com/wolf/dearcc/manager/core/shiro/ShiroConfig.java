@@ -80,7 +80,7 @@ public class ShiroConfig {
 		filterChainDefinitionMap.put("/api/none/sign/in", "anon");
 
 
-		filterChainDefinitionMap.put("/**", "loginFilter");
+		filterChainDefinitionMap.put("/**", "authc,loginFilter");
 		shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
 
 		return shiroFilterFactoryBean;
