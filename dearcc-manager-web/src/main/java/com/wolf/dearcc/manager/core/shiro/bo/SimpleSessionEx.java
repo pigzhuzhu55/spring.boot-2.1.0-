@@ -45,15 +45,19 @@ public class SimpleSessionEx implements ValidatingSession, Serializable {
     private  String host;
     private  Map<Object, Object> attributes;
 
+    private boolean isChanged;
+
     public SimpleSessionEx() {
         this.timeout = 1800000L;
         this.startTimestamp = new Date();
         this.lastAccessTime = this.startTimestamp;
+        this.setChanged(true);
     }
 
     public SimpleSessionEx(String host) {
         this();
         this.host = host;
+        this.setChanged(true);
     }
 
     public Serializable getId() {
@@ -62,6 +66,7 @@ public class SimpleSessionEx implements ValidatingSession, Serializable {
 
     public void setId(Serializable id) {
         this.id = id;
+        this.setChanged(true);
     }
 
     public Date getStartTimestamp() {
@@ -110,7 +115,18 @@ public class SimpleSessionEx implements ValidatingSession, Serializable {
 
     public void setHost(String host) {
         this.host = host;
+        this.setChanged(true);
     }
+
+
+    public boolean isChanged() {
+        return isChanged;
+    }
+
+    public void setChanged(boolean isChanged) {
+        this.isChanged = isChanged;
+    }
+
 
     public Map<Object, Object> getAttributes() {
         return this.attributes;
@@ -118,6 +134,7 @@ public class SimpleSessionEx implements ValidatingSession, Serializable {
 
     public void setAttributes(Map<Object, Object> attributes) {
         this.attributes = attributes;
+        this.setChanged(true);
     }
 
     public void touch() {
@@ -128,7 +145,7 @@ public class SimpleSessionEx implements ValidatingSession, Serializable {
         if (this.stopTimestamp == null) {
             this.stopTimestamp = new Date();
         }
-
+        this.setChanged(true);
     }
 
     protected boolean isStopped() {
@@ -209,6 +226,7 @@ public class SimpleSessionEx implements ValidatingSession, Serializable {
     }
 
     public void setAttribute(Object key, Object value) {
+        this.setChanged(true);
         if (value == null) {
             this.removeAttribute(key);
         } else {
@@ -219,6 +237,7 @@ public class SimpleSessionEx implements ValidatingSession, Serializable {
 
     public Object removeAttribute(Object key) {
         Map<Object, Object> attributes = this.getAttributes();
+        this.setChanged(true);
         return attributes == null ? null : attributes.remove(key);
     }
 

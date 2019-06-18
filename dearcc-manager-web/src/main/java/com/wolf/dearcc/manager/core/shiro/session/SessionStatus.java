@@ -16,13 +16,8 @@ public class SessionStatus implements Serializable {
 	//是否踢出 true:有效，false：踢出。
 	private Boolean onlineStatus = Boolean.TRUE;
 
-	//用于优化，不要每次请求都更新session
-	private java.util.Date lastWriteTime = new java.util.Date();
-
 	public Boolean isOnlineStatus(){
 		return onlineStatus;
 	}
 
-	
-	
 }

@@ -2,6 +2,8 @@ package com.wolf.dearcc.manager.core.shiro;
 
 import com.wolf.dearcc.common.utils.LoggerUtils;
 import com.wolf.dearcc.manager.core.shiro.bo.SimpleSessionEx;
+import com.wolf.dearcc.manager.core.shiro.session.CustomSessionManager;
+import com.wolf.dearcc.manager.core.shiro.session.SessionStatus;
 import com.wolf.dearcc.manager.core.shiro.session.ShiroSessionRepository;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.UnknownSessionException;
@@ -27,7 +29,7 @@ public class CustomShiroSessionDAO extends AbstractSessionDAO {
 
     @Override
     public void update(Session session) throws UnknownSessionException {
-        getShiroSessionRepository().saveSession(session,false);
+        getShiroSessionRepository().saveSession(session);
     }
 
     @Override
@@ -51,7 +53,21 @@ public class CustomShiroSessionDAO extends AbstractSessionDAO {
         Serializable sessionId = this.generateSessionId(session);
         ((SimpleSessionEx) session).setId(sessionId);
         //this.assignSessionId(session, sessionId);
-        getShiroSessionRepository().saveSession(session,true);
+
+        //不存在才添加。
+        SessionStatus sessionStatus;
+        Object sessionStatusObj = session.getAttribute(CustomSessionManager.SESSION_STATUS);
+        if (null == sessionStatusObj) {
+            //Session 踢出自存存储。
+            sessionStatus = new SessionStatus();
+            session.setAttribute(CustomSessionManager.SESSION_STATUS, sessionStatus);
+        }
+        else
+        {
+            sessionStatus = (SessionStatus)sessionStatusObj;
+        }
+
+        getShiroSessionRepository().saveSession(session);
         return sessionId;
     }
 

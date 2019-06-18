@@ -53,7 +53,7 @@ public class RedisShiroSessionRepository implements ShiroSessionRepository {
 
 
     @Override
-    public void saveSession(Session session,Boolean isNew) {
+    public void saveSession(Session session) {
         if (session == null || session.getId() == null)
             throw new NullPointerException("session is empty");
         try {
@@ -61,28 +61,20 @@ public class RedisShiroSessionRepository implements ShiroSessionRepository {
             if (session instanceof ValidatingSession && !((ValidatingSession) session).isValid()) {
                 return;
             }
+            //如果主要值没变，也不要更新
+            if (session instanceof SimpleSessionEx) {
+                // 如果没有主要字段发生改变
+                SimpleSessionEx ss = (SimpleSessionEx) session;
+                if (!ss.isChanged()) {
+                    return;
+                }
+                ss.setChanged(false);
+            }
 
+            //更新redis
             String key = buildRedisSessionKey(session.getId());
-            //不存在才添加。
-            SessionStatus sessionStatus;
-            Object sessionStatusObj = session.getAttribute(CustomSessionManager.SESSION_STATUS);
-            if (null == sessionStatusObj) {
-                //Session 踢出自存存储。
-                sessionStatus = new SessionStatus();
-                session.setAttribute(CustomSessionManager.SESSION_STATUS, sessionStatus);
-            }
-            else
-            {
-                 sessionStatus = (SessionStatus)sessionStatusObj;
-            }
-
-            //避免频繁写入session到redis造成的性能问题，1分钟最多写一次
-            if (isNew||(DateUtils.addtime(sessionStatus.getLastWriteTime(), 12, 1).getTime() - new java.util.Date().getTime()) < 0) {
-                sessionStatus.setLastWriteTime(new java.util.Date());
-                byte[] value = ProtostuffUtil.serialize(session);
-                opsForValue.set(key, Base64.getEncoder().encodeToString(value), session.getTimeout(), TimeUnit.MILLISECONDS);
-            }
-
+            byte[] value = ProtostuffUtil.serialize(session);
+            opsForValue.set(key, Base64.getEncoder().encodeToString(value), session.getTimeout(), TimeUnit.MILLISECONDS);
 
         } catch (Exception e) {
             LoggerUtils.fmtError(getClass(), e, "save session error，id:[%s]", session.getId());

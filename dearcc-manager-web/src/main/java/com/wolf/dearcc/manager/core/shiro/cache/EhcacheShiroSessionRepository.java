@@ -32,7 +32,7 @@ public class EhCacheShiroSessionRepository implements ShiroSessionRepository {
     }
 
     @Override
-    public void saveSession(Session session,Boolean isNew) {
+    public void saveSession(Session session) {
         if (session == null || session.getId() == null)
             throw new NullPointerException("session is empty");
         try {
