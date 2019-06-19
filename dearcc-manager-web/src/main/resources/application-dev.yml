@@ -7,12 +7,13 @@ server:
 logsaveDays: 10
 spring:
   datasource:
+    # 这里我预留了，可以支持多个datasource
     source1:
       type: com.alibaba.druid.pool.DruidDataSource
       driverClassName: com.mysql.jdbc.Driver
-      url: jdbc:mysql://218.104.238.196:8306/dearcc?useUnicode=true&characterEncoding=utf8&useSSL=false
+      url: jdbc:mysql://192.168.2.17:3306/dearcc?useUnicode=true&characterEncoding=utf8&useSSL=false
       username: root
-      password: fjzqhjj
+      password: yourpass123456
       initialSize: 1
       minIdle: 3
       maxActive: 20
@@ -37,10 +38,11 @@ spring:
       #useGlobalDataSourceStat: true
 
   redis:
+    # 这里我预留了，可以支持多个database
     database: 1
-    host: 218.104.238.196
+    host: 192.168.2.17
     port: 6379
-    password: fjzqhjj
+    password: yourpass123456
     timeout: 500
     lettuce:
       pool:

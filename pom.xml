@@ -26,36 +26,7 @@
         <module>dearcc-service</module>
         <module>dearcc-manager-web</module>
     </modules>
-
-    <!-- 配置 maven deploy 地址 -->
-    <distributionManagement>
-        <repository>
-            <id>nexus-releases</id>
-            <name>Nexus Release Repository</name>
-            <url>http://218.104.238.196:8083/repository/maven-releases/</url>
-        </repository>
-        <snapshotRepository>
-            <id>nexus-snapshots</id>
-            <name>Nexus Snapshots Repository</name>
-            <url>http://218.104.238.196:8083/repository/maven-snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
-
-    <!-- 设定主仓库，按设定顺序进行查找 -->
-    <repositories>
-        <repository>
-            <id>nexus</id>
-            <url>http://218.104.238.196:8083/repository/maven-public/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
-
+    
     <!-- 项目属性 -->
     <properties>
         <java.version>1.8</java.version>
