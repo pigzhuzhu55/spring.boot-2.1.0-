@@ -108,6 +108,9 @@ public class RedisShiroSessionRepository implements ShiroSessionRepository {
             String value = opsForValue.get(buildRedisSessionKey(id));
             session = ProtostuffUtil.deserialize(Base64.getDecoder().decode(value), SimpleSessionEx.class);
         } catch (Exception e) {
+            SimpleSessionEx sessionEx = new SimpleSessionEx();
+            sessionEx.setId(id);
+            session= sessionEx;
             LoggerUtils.fmtError(getClass(), e, "获取session异常，id:[%s]", id);
         }
         return session;

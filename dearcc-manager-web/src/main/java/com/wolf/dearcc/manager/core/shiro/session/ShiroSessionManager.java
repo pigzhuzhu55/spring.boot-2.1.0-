@@ -16,6 +16,8 @@ public class ShiroSessionManager extends DefaultWebSessionManager{
         super();
     }
 
+    public static final String SessionKey = "SSMS:";
+
     static final Class<?> CLAZZ = ShiroSessionManager.class;
 
     //重写这个方法为了减少多次从redis中读取session（自定义redisSessionDao中的doReadSession方法）
@@ -27,7 +29,7 @@ public class ShiroSessionManager extends DefaultWebSessionManager{
             request = ((WebSessionKey) sessionKey).getServletRequest();
         }
         if (request != null ) {
-            Session session = (Session) request.getAttribute(TokenManager.SessionKey);
+            Session session = (Session) request.getAttribute(SessionKey);
             if (session != null) {
                 LoggerUtils.info(CLAZZ,"ShiroSessionManager从request上下文获取当前用户的Session");
                 return session;
@@ -37,7 +39,7 @@ public class ShiroSessionManager extends DefaultWebSessionManager{
         if (request != null&&session!=null) {
             LoggerUtils.warn(CLAZZ,"ShiroSessionManager从cache中获取当前用户的Session"+session);
         }
-        request.setAttribute(TokenManager.SessionKey, session);
+        request.setAttribute(SessionKey, session);
         return session;
     }
 

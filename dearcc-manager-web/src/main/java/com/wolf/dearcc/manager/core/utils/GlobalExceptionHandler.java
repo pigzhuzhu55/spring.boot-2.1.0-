@@ -4,6 +4,7 @@ import com.wolf.dearcc.common.model.ApiResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -19,10 +20,13 @@ import java.util.List;
 public class GlobalExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+
     @ExceptionHandler(value = Exception.class)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public ApiResult errorHandler(HttpServletRequest request, Exception e) {
+
+        //UnknownSessionException
 //        MethodArgumentNotValidException mothodEx = (MethodArgumentNotValidException)e;
 //        if(mothodEx != null)
 //        {

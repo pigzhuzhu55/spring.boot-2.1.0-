@@ -23,6 +23,7 @@ public class PermissionFilter extends AccessControlFilter {
 
 		String path = ((HttpServletRequest) request).getServletPath();
 		Boolean isPermitted = false;
+
 		Set<String> restUriPerms=TokenManager.getToken(request).getStringPermissions();
 		if(restUriPerms!=null) {
 			isPermitted = restUriPerms.contains(path);

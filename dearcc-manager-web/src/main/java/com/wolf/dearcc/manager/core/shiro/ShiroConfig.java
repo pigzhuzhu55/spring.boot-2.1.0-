@@ -77,7 +77,7 @@ public class ShiroConfig {
 		filterChainDefinitionMap.put("/v2/api-docs/**", "anon");
 		filterChainDefinitionMap.put("/swagger-resources/**", "anon");
 
-		filterChainDefinitionMap.put("/api/none/sign/in", "anon");
+		filterChainDefinitionMap.put("/api/none/**", "anon");
 
 
 		filterChainDefinitionMap.put("/**", "loginFilter,permFilter");
