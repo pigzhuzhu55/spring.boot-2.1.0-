@@ -27,6 +27,8 @@ public class LoggerUtils {
 	 * 是否开启Debug
 	 */
 	public static boolean isDebug =  LoggerFactory.getLogger(LoggerUtils.class).isDebugEnabled();
+	public static boolean isInfo = LoggerFactory.getLogger(LoggerUtils.class).isInfoEnabled();
+	public static boolean isWarn = LoggerFactory.getLogger(LoggerUtils.class).isWarnEnabled();
 	
 	/**
 	 * Debug 输出
@@ -54,6 +56,63 @@ public class LoggerUtils {
 		}
 		debug(clazz, fmtString);
 	}
+
+	/**
+	 * Info 输出
+	 * @param clazz  	目标.Class
+	 * @param message	输出信息
+	 */
+	public static void info(Class<? extends Object> clazz ,String message){
+		if(!isInfo)return ;
+		Logger logger = LoggerFactory.getLogger(clazz);
+		logger.info(message);
+	}
+
+	/**
+	 * Info 输出
+	 * @param clazz  	目标.Class
+	 * @param fmtString 输出信息key
+	 * @param value		输出信息value
+	 */
+	public static void fmtInfo(Class<? extends Object> clazz,String fmtString,Object...value){
+		if(!isInfo)return ;
+		if(StringUtils.isBlank(fmtString)){
+			return ;
+		}
+		if(null != value && value.length != 0){
+			fmtString = String.format(fmtString, value);
+		}
+		info(clazz, fmtString);
+	}
+
+	/**
+	 * Warn 输出
+	 * @param clazz  	目标.Class
+	 * @param message	输出信息
+	 */
+	public static void warn(Class<? extends Object> clazz ,String message){
+		if(!isWarn)return ;
+		Logger logger = LoggerFactory.getLogger(clazz);
+		logger.warn(message);
+	}
+
+	/**
+	 * Warn 输出
+	 * @param clazz  	目标.Class
+	 * @param fmtString 输出信息key
+	 * @param value		输出信息value
+	 */
+	public static void fmtWarn(Class<? extends Object> clazz,String fmtString,Object...value){
+		if(!isWarn)return ;
+		if(StringUtils.isBlank(fmtString)){
+			return ;
+		}
+		if(null != value && value.length != 0){
+			fmtString = String.format(fmtString, value);
+		}
+		warn(clazz, fmtString);
+	}
+
 	/**
 	 * Error 输出
 	 * @param clazz  	目标.Class

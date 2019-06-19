@@ -23,8 +23,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.Set;
 
@@ -47,7 +50,6 @@ public class SampleRealm extends AuthorizingRealm {
 	public static final short forbit = 1;
 	//1:有效
 	public static final short valid = 0;
-
 
 	public SampleRealm() {
 		super();
@@ -77,15 +79,15 @@ public class SampleRealm extends AuthorizingRealm {
 		SimpleAuthenticationInfo sai = new SimpleAuthenticationInfo(uuser,user.getPassword(), getName());
 
 		//互踢
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 		//获取当前用户保存的SessionId，用于互踢，如果为空，说明当前服务器上未登陆该用户
-		String singleSessionId = TokenManager.getSessionId();
+		String singleSessionId = TokenManager.getSessionId(request);
 		//当前用户的SessionId
-        String sessionId = TokenManager.getSession().getId().toString();
+        String sessionId = TokenManager.getSession(request).getId().toString();
         //如果sessionId不一样，说明同一个账号登陆多个地方
 		if (StringUtils.isBlank(singleSessionId) || !sessionId.equals(singleSessionId)) {
 
-			SessionStatus sessionStatus = (SessionStatus)TokenManager.getSession().getAttribute(CustomSessionManager.SESSION_STATUS);
-			TokenManager.setSessionId(sessionId);
+			TokenManager.setSessionId(request,sessionId);
 		}
 		//根据用户ID查询角色（role），放入到Authorization里。
 		Set<String> roles = roleService.findRoleByUserId(user.getId());
@@ -97,19 +99,22 @@ public class SampleRealm extends AuthorizingRealm {
 		return  sai;
     }
 
-	 /** 
-     * 授权 每次请求授权验证，这个方法都要执行一遍，感觉shiro的设计真是不考虑任何性能啊~~
-     */  
-    @Override  
+	/**
+	 * 授权 其实这里我绕过去了，基本上不会用到，因为我授权是从session里面的UUSer去获取，再根据URI进行判断
+	 */
+	@Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-    	
-    	UUser user = TokenManager.getToken();
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+		UUser user = TokenManager.getToken(request);
 		SimpleAuthorizationInfo info =  new SimpleAuthorizationInfo();
 		info.setRoles(user.getRoles());
 		info.setStringPermissions(user.getStringPermissions());
         return info;  
     }
 
+	/**
+	 * 授权 每次请求授权验证，这个方法都要执行一遍，~~
+	 */
     @Override
 	protected AuthorizationInfo getAuthorizationInfo(PrincipalCollection principals) {
 		if (principals == null) {

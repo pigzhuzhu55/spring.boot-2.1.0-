@@ -22,7 +22,6 @@ import javax.annotation.PostConstruct;
 import java.io.Serializable;
 import java.util.Base64;
 import java.util.Collection;
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -54,8 +53,10 @@ public class RedisShiroSessionRepository implements ShiroSessionRepository {
 
     @Override
     public void saveSession(Session session) {
-        if (session == null || session.getId() == null)
-            throw new NullPointerException("session is empty");
+        if (session == null || session.getId() == null) {
+            return;
+            //throw new NullPointerException("session is empty");
+        }
         try {
             //如果会话过期/停止 没必要再更新了
             if (session instanceof ValidatingSession && !((ValidatingSession) session).isValid()) {
@@ -84,7 +85,8 @@ public class RedisShiroSessionRepository implements ShiroSessionRepository {
     @Override
     public void deleteSession(Serializable id) {
         if (id == null) {
-            throw new NullPointerException("session id is empty");
+            return;
+            //throw new NullPointerException("session id is empty");
         }
         try {
             opsForValue.getOperations().delete(buildRedisSessionKey(id));
@@ -97,8 +99,10 @@ public class RedisShiroSessionRepository implements ShiroSessionRepository {
 
     @Override
     public Session getSession(Serializable id) {
-        if (id == null)
-            throw new NullPointerException("session id is empty");
+        if (id == null) {
+            return null;
+            //throw new NullPointerException("session id is empty");
+        }
         Session session = null;
         try {
             String value = opsForValue.get(buildRedisSessionKey(id));

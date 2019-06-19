@@ -1,5 +1,8 @@
 package com.wolf.dearcc.manager.core.shiro.session;
 
+import com.wolf.dearcc.common.utils.LoggerUtils;
+import com.wolf.dearcc.manager.core.shiro.token.manager.TokenManager;
+import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.SessionKey;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
@@ -13,24 +16,29 @@ public class ShiroSessionManager extends DefaultWebSessionManager{
         super();
     }
 
+    static final Class<?> CLAZZ = ShiroSessionManager.class;
 
     //重写这个方法为了减少多次从redis中读取session（自定义redisSessionDao中的doReadSession方法）
+    //TokenManager里面也有类似的上下文增强
     protected Session retrieveSession(SessionKey sessionKey) {
-        Serializable sessionId = getSessionId(sessionKey);
+        //Serializable sessionId = getSessionId(sessionKey);
         ServletRequest request = null;
         if (sessionKey instanceof WebSessionKey) {
             request = ((WebSessionKey) sessionKey).getServletRequest();
         }
-        if (request != null && sessionId != null) {
-            Session session = (Session) request.getAttribute(sessionId.toString());
+        if (request != null ) {
+            Session session = (Session) request.getAttribute(TokenManager.SessionKey);
             if (session != null) {
+                LoggerUtils.info(CLAZZ,"ShiroSessionManager从request上下文获取当前用户的Session");
                 return session;
             }
         }
         Session session = super.retrieveSession(sessionKey);
-        if (request != null && sessionId != null) {
-            request.setAttribute(sessionId.toString(), session);
+        if (request != null&&session!=null) {
+            LoggerUtils.warn(CLAZZ,"ShiroSessionManager从cache中获取当前用户的Session"+session);
         }
+        request.setAttribute(TokenManager.SessionKey, session);
         return session;
     }
+
 }

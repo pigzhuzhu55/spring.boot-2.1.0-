@@ -7,6 +7,7 @@ import com.wolf.dearcc.manager.core.shiro.cache.impl.CustomShiroCacheManager;
 import com.wolf.dearcc.manager.core.shiro.cache.impl.EhCacheShiroCacheManager;
 import com.wolf.dearcc.manager.core.shiro.cache.impl.RedisShiroCacheManager;
 import com.wolf.dearcc.manager.core.shiro.filter.LoginFilter;
+import com.wolf.dearcc.manager.core.shiro.filter.PermissionFilter;
 import com.wolf.dearcc.manager.core.shiro.listenter.CustomSessionListener;
 import com.wolf.dearcc.manager.core.shiro.session.CustomSessionManager;
 import com.wolf.dearcc.manager.core.shiro.session.ShiroSessionManager;
@@ -63,6 +64,7 @@ public class ShiroConfig {
 		//shiroFilterFactoryBean.setUnauthorizedUrl("/403");
 		LinkedHashMap<String, Filter> filter = new LinkedHashMap<>();
 		filter.put("loginFilter", new LoginFilter());
+		filter.put("permFilter",new PermissionFilter());
 		shiroFilterFactoryBean.setFilters(filter);
 		LinkedHashMap<String, String> filterChainDefinitionMap = new LinkedHashMap<>();
 		// 配置不会被拦截的链接
@@ -78,7 +80,7 @@ public class ShiroConfig {
 		filterChainDefinitionMap.put("/api/none/sign/in", "anon");
 
 
-		filterChainDefinitionMap.put("/**", "loginFilter");
+		filterChainDefinitionMap.put("/**", "loginFilter,permFilter");
 
 
 		shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);

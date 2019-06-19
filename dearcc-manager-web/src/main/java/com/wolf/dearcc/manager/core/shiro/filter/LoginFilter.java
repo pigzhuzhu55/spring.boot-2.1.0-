@@ -28,21 +28,21 @@ import java.util.Map;
 public class LoginFilter extends AccessControlFilter {
 
 
-	final static Class<LoginFilter> CLASS = LoginFilter.class;
 	@Override
 	protected boolean isAccessAllowed(ServletRequest request,
                                       ServletResponse response, Object mappedValue) throws Exception {
 
-		UUser token = TokenManager.getToken();
+		//当前用户的SessionId
+		String sessionId = TokenManager.getSession(request).getId().toString();
 
-		if(null != token || isLoginRequest(request, response)){// && isEnabled()
+		UUser token = TokenManager.getToken(request);
+
+		if(null != token || isLoginRequest(request, response)){
 
 
 			//互踢
 			//获取当前用户保存的SessionId，用于互踢，如果为空，说明当前服务器上未登陆该用户
-			String singleSessionId = TokenManager.getSessionId();
-			//当前用户的SessionId
-			String sessionId = TokenManager.getSession().getId().toString();
+			String singleSessionId = TokenManager.getSessionId(request);
 			//如果sessionId不一样，说明同一个账号登陆多个地方
 			if (StringUtils.isNotBlank(singleSessionId) && !sessionId.equals(singleSessionId)) {
 				ShiroFilterUtils.out(response, ApiResult.Fail("您的账号在别处登陆！"));

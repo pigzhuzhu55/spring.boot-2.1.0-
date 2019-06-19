@@ -18,6 +18,7 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.bind.annotation.*;
 import com.wolf.dearcc.common.model.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @Api(value="sign",tags={"1、登陆管理"},position = 1)
@@ -25,7 +26,8 @@ import javax.validation.Valid;
 @RequestMapping(value = {"/api/none/sign"})
 public class SignController {
 
-
+    @Autowired
+    HttpServletRequest request;
 
     @Autowired
     private PtOrganizationService ptOrganizationService;
@@ -38,7 +40,7 @@ public class SignController {
     @ResponseBody()
     public ApiResult<SignInDto> loginIn(@RequestBody @Valid SignInForm form) {
 
-        UUser user = TokenManager.login(form.getUserName(),form.getPassword(),true);
+        UUser user = TokenManager.login(request,form.getUserName(),form.getPassword(),true);
 
         return ApiResult.Success(user);
     }
