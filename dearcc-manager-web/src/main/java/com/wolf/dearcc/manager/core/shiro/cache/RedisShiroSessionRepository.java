@@ -121,9 +121,6 @@ public class RedisShiroSessionRepository implements ShiroSessionRepository {
         return null;
     }
 
-    private String buildRedisSessionKey(Serializable sessionId) {
-        return SHIRO_SESSION_PRE + sessionId;
-    }
 
     @Override
     public String getSessonId(Integer userId) {
@@ -141,4 +138,7 @@ public class RedisShiroSessionRepository implements ShiroSessionRepository {
         opsForHash.put(SHIRO_SESSION_PRE_ALL, userId.toString(), sessionId);
     }
 
+    private String buildRedisSessionKey(Serializable sessionId) {
+        return SHIRO_SESSION_PRE + sessionId;
+    }
 }

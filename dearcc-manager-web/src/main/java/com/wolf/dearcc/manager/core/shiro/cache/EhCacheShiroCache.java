@@ -2,6 +2,7 @@ package com.wolf.dearcc.manager.core.shiro.cache;
 
 import com.wolf.dearcc.common.utils.LoggerUtils;
 import com.wolf.dearcc.common.utils.ProtostuffUtil;
+import com.wolf.dearcc.manager.core.shiro.bo.SimpleSessionEx;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
@@ -36,7 +37,7 @@ public class EhCacheShiroCache<K, V> extends ShiroCache implements Cache<K, V> {
     public V get(K key) throws CacheException {
         try {
             byte[] byteValue = (byte[])ehCacheManager.getCache(SHIRO_CACHE_NAME).get(buildCacheKey(key));
-            return (V) ProtostuffUtil.deserialize(byteValue,Object.class);
+            return (V) ProtostuffUtil.deserialize(byteValue, SimpleSessionEx.class);
         } catch (Exception e) {
             LoggerUtils.error(SELF, "get value by cache throw exception",e);
         }
